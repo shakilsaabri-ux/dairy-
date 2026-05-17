@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Buffalo Dairy">
+<title>Buffalo Dairy Farm Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --bg:        #060d0a;
+  --bg2:       #0b1812;
+  --surface:   #101e16;
+  --surface2:  #162a1e;
+  --border:    #1c3426;
+  --border2:   #254836;
+  --green:     #00e07a;
+  --green2:    #00a854;
+  --green3:    #003d20;
+  --teal:      #00d4aa;
+  --amber:     #f5a623;
+  --red:       #ff4757;
+  --blue:      #4a9eff;
+  --purple:    #b066ff;
+  --orange:    #ff7043;
+  --text:      #d6edd8;
+  --text2:     #7aaa88;
+  --text3:     #3d6648;
+  --font:      'DM Sans', sans-serif;
+  --display:   'Syne', sans-serif;
+  --mono:      'JetBrains Mono', monospace;
+  --r:         12px;
+  --r2:        18px;
+  --sidebar:   260px;
+}
+
+/* ═══════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════
+   APP LAYOUT — DESKTOP (sidebar + content)
+═══════════════════════════════════════════════ */
+#app {
+  display: flex;
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* ─── SIDEBAR ─────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar);
+  flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 100;
+}
+.sidebar-logo {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo .logo-icon { font-size: 36px; margin-bottom: 8px; }
+.sidebar-logo .logo-name {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--green);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.sidebar-logo .logo-sub { font-size: 11px; color: var(--text3); margin-top: 3px; letter-spacing: 1px; }
+
+.sidebar-month {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.month-select {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: var(--green);
+  font-size: 13px;
+  font-family: var(--mono);
+  font-weight: 700;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+.nav-group-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 12px 8px 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+}
+.nav-item:hover { background: var(--surface); color: var(--text); }
+.nav-item.active {
+  background: rgba(0,224,122,0.12);
+  color: var(--green);
+  font-weight: 700;
+}
+.nav-item .nav-icon { font-size: 18px; flex-shrink: 0; width: 24px; text-align: center; }
+.nav-item .nav-badge {
+  margin-left: auto;
+  background: var(--red);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-family: var(--mono);
+}
+
+.sidebar-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+}
+.herd-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.hs-item {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+.hs-num { font-size: 18px; font-weight: 800; font-family: var(--mono); color: var(--green); }
+.hs-num.amber { color: var(--amber); }
+.hs-label { font-size: 9px; color: var(--text3); margin-top: 1px; }
+
+/* ─── MAIN CONTENT ────────────────────────────── */
+.main-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  height: 58px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  gap: 14px;
+  flex-shrink: 0;
+}
+.topbar-title {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  flex: 1;
+}
+.topbar-search {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 7px 12px;
+  gap: 8px;
+  min-width: 200px;
+}
+.topbar-search input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--font);
+  width: 100%;
+}
+.topbar-search input::placeholder { color: var(--text3); }
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+
+/* ═══════════════════════════════════════════════
+   MOBILE — bottom tab layout
+═══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  #app { flex-direction: column; }
+  .sidebar { display: none; }
+  .main-wrap { height: 100dvh; }
+  .topbar { padding: 0 16px; height: 50px; padding-top: env(safe-area-inset-top, 0); height: calc(50px + env(safe-area-inset-top, 0)); }
+  .topbar-search { display: none; }
+  .content { padding: 14px 14px; padding-bottom: calc(70px + env(safe-area-inset-bottom, 0)); }
+  .mobile-tabbar { display: flex !important; }
+  /* Desktop grid → mobile stack */
+  .grid-4 { grid-template-columns: 1fr 1fr !important; }
+  .grid-3 { grid-template-columns: 1fr 1fr !important; }
+  .form-row { grid-template-columns: 1fr !important; }
+  .form-row.always-two { grid-template-columns: 1fr 1fr !important; }
+  .content-cols { flex-direction: column !important; }
+  .khila-grid { grid-template-columns: repeat(7, 1fr) !important; }
+}
+
+/* ─── MOBILE TABBAR ───────────────────────────── */
+.mobile-tabbar {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(11,24,18,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 8px 0 env(safe-area-inset-bottom, 8px);
+  z-index: 200;
+  justify-content: space-around;
+}
+.mt-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 12px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: transform 0.15s;
+}
+.mt-item:active { transform: scale(0.9); }
+.mt-icon { font-size: 22px; }
+.mt-label { font-size: 9px; font-weight: 600; color: var(--text3); letter-spacing: 0.3px; }
+.mt-item.active .mt-label { color: var(--green); }
+.mt-item.active .mt-icon { filter: brightness(1.3); }
+
+/* ═══════════════════════════════════════════════
+   COMPONENTS
+═══════════════════════════════════════════════ */
+
+/* Stat Cards */
+.stat-grid { display: grid; gap: 12px; margin-bottom: 20px; }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--green);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.stat-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.stat-card:hover::after { opacity: 1; }
+.stat-card.warn::after { background: var(--amber); opacity: 1; }
+.stat-card.danger::after { background: var(--red); opacity: 1; }
+.stat-card.warn { border-color: rgba(245,166,35,0.3); }
+.stat-card.danger { border-color: rgba(255,71,87,0.3); }
+.sc-num {
+  font-size: 32px;
+  font-weight: 800;
+  font-family: var(--mono);
+  color: var(--green);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.sc-num.amber  { color: var(--amber); }
+.sc-num.red    { color: var(--red); }
+.sc-num.blue   { color: var(--blue); }
+.sc-num.teal   { color: var(--teal); }
+.sc-num.purple { color: var(--purple); }
+.sc-label { font-size: 12px; color: var(--text3); font-weight: 500; }
+.sc-sub { font-size: 11px; color: var(--text3); margin-top: 4px; font-family: var(--mono); }
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+}
+.card-title {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+.card-meta { font-size: 12px; color: var(--text3); font-family: var(--mono); }
+.card-body { padding: 16px 18px; }
+
+/* Table */
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl th {
+  padding: 9px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: left;
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+}
+.tbl td {
+  padding: 11px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(28,52,38,0.5);
+  vertical-align: middle;
+}
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tbody tr { cursor: pointer; transition: background 0.1s; }
+.tbl tbody tr:hover td { background: rgba(0,224,122,0.04); }
+.tbl tbody tr:active td { background: rgba(0,224,122,0.08); }
+.tbl tfoot td { background: rgba(0,0,0,0.3); font-weight: 700; border-top: 1px solid var(--border); font-family: var(--mono); border-bottom: none; }
+.tbl tr.r-warn td { background: rgba(245,166,35,0.06); }
+.tbl tr.r-alert td { background: rgba(255,71,87,0.06); }
+.tbl tr.r-blue td { background: rgba(74,158,255,0.06); }
+.tbl tr.r-ok td { background: rgba(0,224,122,0.04); }
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--mono);
+  white-space: nowrap;
+}
+.b-green  { background: rgba(0,224,122,0.12);  color: var(--green);  border: 1px solid rgba(0,224,122,0.25); }
+.b-amber  { background: rgba(245,166,35,0.12); color: var(--amber);  border: 1px solid rgba(245,166,35,0.25); }
+.b-red    { background: rgba(255,71,87,0.12);  color: var(--red);    border: 1px solid rgba(255,71,87,0.25); }
+.b-blue   { background: rgba(74,158,255,0.12); color: var(--blue);   border: 1px solid rgba(74,158,255,0.25); }
+.b-teal   { background: rgba(0,212,170,0.12);  color: var(--teal);   border: 1px solid rgba(0,212,170,0.25); }
+.b-purple { background: rgba(176,102,255,0.12);color: var(--purple); border: 1px solid rgba(176,102,255,0.25); }
+.b-gray   { background: rgba(122,170,136,0.12);color: var(--text2);  border: 1px solid rgba(122,170,136,0.2); }
+
+/* Forms */
+.form-section {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.form-section h3 {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+.form-row.four  { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.form-row.one   { grid-template-columns: 1fr; }
+.form-group label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 13px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+.form-group input:focus,
+.form-group select:focus { border-color: var(--green); }
+.form-group select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M0 0l6 7 6-7z' fill='%233d6648'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+.form-group input[readonly] { color: var(--green); opacity: 0.9; cursor: default; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.2px;
+}
+.btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.btn:active { transform: scale(0.97); }
+.btn-full { width: 100%; }
+.btn-primary { background: linear-gradient(135deg, var(--green2), var(--green)); color: #030d06; }
+.btn-danger  { background: linear-gradient(135deg, #c62828, var(--red)); color: #fff; }
+.btn-amber   { background: linear-gradient(135deg, #e65100, var(--amber)); color: #030d06; }
+.btn-blue    { background: linear-gradient(135deg, #1565c0, var(--blue)); color: #fff; }
+.btn-ghost   { background: transparent; border: 1.5px solid var(--border2); color: var(--text2); }
+.btn-ghost:hover { border-color: var(--green); color: var(--green); }
+.btn-sm {
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  border: 1.5px solid;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-weight: 700;
+  transition: all 0.1s;
+}
+.btn-sm:active { opacity: 0.7; }
+.bsm-green { color: var(--green);  border-color: rgba(0,224,122,0.35); }
+.bsm-red   { color: var(--red);    border-color: rgba(255,71,87,0.35); }
+.bsm-amber { color: var(--amber);  border-color: rgba(245,166,35,0.35); }
+
+/* P&L Block */
+.pl-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.pl-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(28,52,38,0.5);
+}
+.pl-row:last-child { border: none; background: rgba(0,0,0,0.25); }
+.pl-label { font-size: 13px; color: var(--text2); }
+.pl-value { font-size: 14px; font-weight: 700; font-family: var(--mono); }
+
+/* Alert rows */
+.alert-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--surface);
+  border-left: 3px solid;
+  border-radius: 0 10px 10px 0;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.alert-row:hover { opacity: 0.85; }
+.al-green  { border-color: var(--green); }
+.al-amber  { border-color: var(--amber); }
+.al-red    { border-color: var(--red); }
+.al-orange { border-color: var(--orange); }
+.al-blue   { border-color: var(--blue); }
+.ar-title  { font-size: 13px; font-weight: 600; }
+.ar-sub    { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+.ar-right  { font-size: 11px; color: var(--text3); text-align: right; font-family: var(--mono); }
+
+/* Pills / filters */
+.pill-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+  margin-bottom: 14px;
+  -webkit-overflow-scrolling: touch;
+}
+.pill-row::-webkit-scrollbar { display: none; }
+.pill {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text3);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.pill:hover { border-color: var(--border2); color: var(--text2); }
+.pill.on { border-color: var(--green); color: var(--green); background: rgba(0,224,122,0.08); }
+.pill.on-amber { border-color: var(--amber); color: var(--amber); background: rgba(245,166,35,0.08); }
+.pill.on-red   { border-color: var(--red);   color: var(--red);   background: rgba(255,71,87,0.08); }
+
+/* Khila grid */
+.khila-grid {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  gap: 3px;
+  padding: 14px;
+}
+.kc {
+  aspect-ratio: 1;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  cursor: pointer;
+  border: 1px solid;
+  transition: transform 0.1s, filter 0.1s;
+  padding: 1px;
+  text-align: center;
+  line-height: 1.1;
+}
+.kc:hover { transform: scale(1.15); filter: brightness(1.2); z-index: 1; }
+.kc .kn { font-size: 6px; font-weight: 700; }
+.kc .ki { font-size: 5px; opacity: 0.85; }
+.kc-empty    { background: rgba(0,0,0,0.3);           border-color: var(--border);               color: var(--text3); }
+.kc-active   { background: rgba(0,224,122,0.1);        border-color: rgba(0,224,122,0.4);         color: var(--green); }
+.kc-pregnant { background: rgba(74,158,255,0.12);      border-color: rgba(74,158,255,0.4);        color: var(--blue); }
+.kc-khali    { background: rgba(245,166,35,0.12);      border-color: rgba(245,166,35,0.4);        color: var(--amber); }
+.kc-alert    { background: rgba(255,112,67,0.12);      border-color: rgba(255,112,67,0.4);        color: var(--orange); }
+
+/* Content columns for desktop */
+.content-cols {
+  display: flex;
+  gap: 16px;
+}
+.col-left  { flex: 1; min-width: 0; }
+.col-right { width: 340px; flex-shrink: 0; }
+@media (max-width: 1100px) {
+  .col-right { width: 280px; }
+  .khila-grid { grid-template-columns: repeat(10,1fr); }
+}
+
+/* Modal */
+.modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  padding: 20px;
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r2);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: popIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title { font-family: var(--display); font-size: 16px; font-weight: 800; color: var(--green); }
+.modal-close { background: var(--surface); border: none; border-radius: 50%; width: 28px; height: 28px; color: var(--text2); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.modal-body { padding: 18px 20px; }
+.modal-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid rgba(28,52,38,0.5); gap: 12px; }
+.modal-row:last-of-type { border: none; }
+.mr-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; flex-shrink: 0; }
+.mr-value { font-size: 13px; font-weight: 600; font-family: var(--mono); text-align: right; word-break: break-all; }
+.modal-actions { display: flex; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.modal-actions button { flex: 1; min-width: 100px; padding: 10px; border-radius: 10px; border: none; font-size: 13px; font-weight: 700; font-family: var(--font); cursor: pointer; }
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(0,224,122,0.95);
+  color: #030d06;
+  padding: 10px 22px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.err  { background: rgba(255,71,87,0.95); color: #fff; }
+
+/* Section divider */
+.sec-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin: 20px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* Empty state */
+.empty { text-align: center; padding: 36px 20px; color: var(--text3); }
+.empty .ei { font-size: 48px; margin-bottom: 12px; }
+.empty .et { font-size: 14px; }
+
+/* Text helpers */
+.tg { color: var(--green) !important; }
+.ta { color: var(--amber) !important; }
+.tr { color: var(--red) !important; }
+.tb { color: var(--blue) !important; }
+.tt { color: var(--teal) !important; }
+.tm { color: var(--text3) !important; }
+.fw7 { font-weight: 700 !important; }
+.mono { font-family: var(--mono) !important; }
+.small { font-size: 11px !important; }
+
+/* Page tabs (mobile only shows) */
+.page { display: none; }
+.page.active { display: block; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ═══ SIDEBAR (desktop) ═══ -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🐃</div>
+      <div class="logo-name">Buffalo Dairy</div>
+      <div class="logo-sub">FARM MANAGEMENT</div>
+    </div>
+
+    <div class="sidebar-month">
+      <select class="month-select" id="global-month" onchange="setGlobalMonth(this.value)">
+        <option value="2026-03">March 2026</option>
+        <option value="2026-04">April 2026</option>
+        <option value="2026-05" selected>May 2026</option>
+        <option value="2026-06">June 2026</option>
+        <option value="2026-07">July 2026</option>
+        <option value="2026-08">August 2026</option>
+      </select>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">Main</div>
+      <button class="nav-item active" onclick="nav('dash')">    <span class="nav-icon">📊</span> Dashboard</button>
+      <button class="nav-item" onclick="nav('fali')">           <span class="nav-icon">🐂</span> Fali Book <span class="nav-badge" id="nb-fali" style="display:none">!</span></button>
+      <button class="nav-item" onclick="nav('khila')">          <span class="nav-icon">🏠</span> Khila Book</button>
+      <button class="nav-item" onclick="nav('milk')">           <span class="nav-icon">🥛</span> Milk Register</button>
+      <div class="nav-group-label">Farm</div>
+      <button class="nav-item" onclick="nav('stock')">          <span class="nav-icon">🌾</span> Feed Stock</button>
+      <button class="nav-item" onclick="nav('gujarat')">        <span class="nav-icon">🚛</span> Gujarat / Falat</button>
+      <button class="nav-item" onclick="nav('labour')">         <span class="nav-icon">👷</span> Labour</button>
+      <div class="nav-group-label">Accounts</div>
+      <button class="nav-item" onclick="nav('accounts')">       <span class="nav-icon">💰</span> Accounts</button>
+      <button class="nav-item" onclick="nav('monthly')">        <span class="nav-icon">📆</span> Monthly Report</button>
+      <button class="nav-item" onclick="nav('yearly')">         <span class="nav-icon">📅</span> Yearly Report</button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase">Herd Summary</div>
+      <div class="herd-summary">
+        <div class="hs-item"><div class="hs-num" id="sf-81">108</div><div class="hs-label">Shed 8/1</div></div>
+        <div class="hs-item"><div class="hs-num" id="sf-82">104</div><div class="hs-label">Shed 8/2</div></div>
+        <div class="hs-item"><div class="hs-num amber" id="sf-tosif">17</div><div class="hs-label">Tosif</div></div>
+        <div class="hs-item"><div class="hs-num amber" id="sf-noora">38</div><div class="hs-label">Noora</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <div class="main-wrap">
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">Dashboard</div>
+      <div class="topbar-search">
+        <span>🔍</span>
+        <input type="text" placeholder="Search buffalo ID, khila..." id="global-search" oninput="doSearch(this.value)">
+      </div>
+    </div>
+
+    <div class="content" id="content">
+      <!-- Pages rendered here -->
+      <div class="page active" id="page-dash"></div>
+      <div class="page" id="page-fali"></div>
+      <div class="page" id="page-khila"></div>
+      <div class="page" id="page-milk"></div>
+      <div class="page" id="page-stock"></div>
+      <div class="page" id="page-gujarat"></div>
+      <div class="page" id="page-labour"></div>
+      <div class="page" id="page-accounts"></div>
+      <div class="page" id="page-monthly"></div>
+      <div class="page" id="page-yearly"></div>
+    </div>
+  </div>
+
+  <!-- Mobile tab bar -->
+  <div class="mobile-tabbar">
+    <button class="mt-item active" onclick="nav('dash')"><div class="mt-icon">📊</div><div class="mt-label">Dash</div></button>
+    <button class="mt-item" onclick="nav('fali')"><div class="mt-icon">🐂</div><div class="mt-label">Fali</div></button>
+    <button class="mt-item" onclick="nav('milk')"><div class="mt-icon">🥛</div><div class="mt-label">Milk</div></button>
+    <button class="mt-item" onclick="nav('khila')"><div class="mt-icon">🏠</div><div class="mt-label">Khila</div></button>
+    <button class="mt-item" onclick="nav('more')"><div class="mt-icon">⋯</div><div class="mt-label">More</div></button>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="m-title"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="m-body"></div>
+    <div class="modal-actions" id="m-actions"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════════════════ */
+const C = {
+  TODAY:   '2026-05-15',
+  MONTHS:  ['2026-03','2026-04','2026-05','2026-06','2026-07','2026-08'],
+  ML:      {'2026-03':'Mar 26','2026-04':'Apr 26','2026-05':'May 26','2026-06':'Jun 26','2026-07':'Jul 26','2026-08':'Aug 26'},
+  MLL:     {'2026-03':'March 2026','2026-04':'April 2026','2026-05':'May 2026','2026-06':'June 2026','2026-07':'July 2026','2026-08':'August 2026'},
+  BULLS:   ['50','66','82','34','1','17','Bhura','Jafoa','Baccha','AI','Ino','B'],
+  RATES:   {'Sunrise Hotel':2.20,'Shahi Hotel':2.20,'Adil Hail':2.20,'Mathura Dairy':2.00,'Mathura Foods':2.00,'Famous Hail':2.00},
+  CARE:    {Tosif:{rate:3100,farm:'Manpura'},Noora:{rate:3300,farm:'Gujarat'}},
+  TR_OUT:  1700, TR_IN: 3000, DEATH_V: 100000,
+};
+
+/* ═══════════════════════════════════════════════════════
+   DATABASE
+═══════════════════════════════════════════════════════ */
+let DB = {}, _id = 8000;
+const uid = () => ++_id;
+const fmt = n => Math.round(n||0).toLocaleString('en-IN');
+const fd  = d => { if(!d) return '—'; try{const[y,m,dd]=d.split('-');return`${dd}/${m}/${y.slice(2)}`;}catch{return d;} };
+const ml  = m => C.ML[m]||m;
+const mll = m => C.MLL[m]||m;
+const dAgo= d => Math.round((new Date(C.TODAY)-new Date(d))/864e5);
+
+function initDB(){
+  DB = {
+    fali: [
+      // ─── SHED 8/1 MARCH ───
+      {id:1,shed:'8/1',month:'2026-03',bufId:'1609',khila:'29',date:'2026-03-01',bull:'66',status:'K',note:'Khali 30/4'},
+      {id:2,shed:'8/1',month:'2026-03',bufId:'1644',khila:'16',date:'2026-03-03',bull:'Bhura',status:'R',note:''},
+      {id:3,shed:'8/1',month:'2026-03',bufId:'1650',khila:'30',date:'2026-03-04',bull:'82',status:'R',note:''},
+      {id:4,shed:'8/1',month:'2026-03',bufId:'1688',khila:'22',date:'2026-03-05',bull:'Jafoa',status:'R',note:''},
+      {id:5,shed:'8/1',month:'2026-03',bufId:'1812',khila:'72',date:'2026-03-07',bull:'Bhura',status:'P',note:'8/5 Paid'},
+      {id:6,shed:'8/1',month:'2026-03',bufId:'1427',khila:'12',date:'2026-03-08',bull:'Baccha',status:'R',note:''},
+      {id:7,shed:'8/1',month:'2026-03',bufId:'1866',khila:'20',date:'2026-03-09',bull:'Jafoa',status:'R',note:''},
+      {id:8,shed:'8/1',month:'2026-03',bufId:'1898',khila:'40',date:'2026-03-10',bull:'34',status:'R',note:''},
+      {id:9,shed:'8/1',month:'2026-03',bufId:'1306',khila:'83',date:'2026-03-11',bull:'66',status:'',note:''},
+      {id:10,shed:'8/1',month:'2026-03',bufId:'1845',khila:'73',date:'2026-03-13',bull:'Baccha',status:'R',note:''},
+      {id:11,shed:'8/1',month:'2026-03',bufId:'1398',khila:'81',date:'2026-03-14',bull:'82',status:'R',note:''},
+      {id:12,shed:'8/1',month:'2026-03',bufId:'982',khila:'19',date:'2026-03-15',bull:'66',status:'',note:''},
+      {id:13,shed:'8/1',month:'2026-03',bufId:'1332',khila:'54',date:'2026-03-18',bull:'Baccha',status:'',note:''},
+      {id:14,shed:'8/1',month:'2026-03',bufId:'718',khila:'3',date:'2026-03-19',bull:'34',status:'',note:''},
+      {id:15,shed:'8/1',month:'2026-03',bufId:'1644',khila:'16',date:'2026-03-20',bull:'66',status:'',note:''},
+      {id:16,shed:'8/1',month:'2026-03',bufId:'1900',khila:'68',date:'2026-03-22',bull:'82',status:'',note:'Bimar'},
+      {id:17,shed:'8/1',month:'2026-03',bufId:'1666',khila:'91',date:'2026-03-23',bull:'66',status:'R',note:''},
+      {id:18,shed:'8/1',month:'2026-03',bufId:'1429',khila:'46',date:'2026-03-24',bull:'Bhura',status:'R',note:''},
+      {id:19,shed:'8/1',month:'2026-03',bufId:'1683',khila:'45',date:'2026-03-26',bull:'Jafoa',status:'',note:''},
+      {id:20,shed:'8/1',month:'2026-03',bufId:'1461',khila:'6',date:'2026-03-27',bull:'82',status:'R',note:''},
+      {id:21,shed:'8/1',month:'2026-03',bufId:'1429',khila:'46',date:'2026-03-30',bull:'Jafoa',status:'R',note:''},
+      {id:22,shed:'8/1',month:'2026-03',bufId:'1845',khila:'73',date:'2026-03-31',bull:'Bhura',status:'',note:''},
+      // ─── SHED 8/2 MARCH ───
+      {id:101,shed:'8/2',month:'2026-03',bufId:'1833',khila:'12',date:'2026-03-01',bull:'82',status:'R',note:''},
+      {id:102,shed:'8/2',month:'2026-03',bufId:'1817',khila:'73',date:'2026-03-01',bull:'34',status:'R',note:''},
+      {id:103,shed:'8/2',month:'2026-03',bufId:'1675',khila:'52',date:'2026-03-03',bull:'1',status:'R',note:''},
+      {id:104,shed:'8/2',month:'2026-03',bufId:'1399',khila:'4',date:'2026-03-04',bull:'34',status:'P',note:'30/4'},
+      {id:105,shed:'8/2',month:'2026-03',bufId:'1299',khila:'27',date:'2026-03-05',bull:'Jafoa',status:'P',note:'8/5'},
+      {id:106,shed:'8/2',month:'2026-03',bufId:'1496',khila:'81',date:'2026-03-05',bull:'Bhura',status:'K',note:'Urimin'},
+      {id:107,shed:'8/2',month:'2026-03',bufId:'114',khila:'23',date:'2026-03-07',bull:'34',status:'R',note:''},
+      {id:108,shed:'8/2',month:'2026-03',bufId:'1151',khila:'97',date:'2026-03-09',bull:'Bhura',status:'K',note:'Urimin'},
+      {id:109,shed:'8/2',month:'2026-03',bufId:'1676',khila:'20',date:'2026-03-10',bull:'34',status:'R',note:''},
+      {id:110,shed:'8/2',month:'2026-03',bufId:'1833',khila:'12',date:'2026-03-11',bull:'82',status:'R',note:''},
+      {id:111,shed:'8/2',month:'2026-03',bufId:'1665',khila:'11',date:'2026-03-12',bull:'Jafoa',status:'',note:''},
+      {id:112,shed:'8/2',month:'2026-03',bufId:'1056',khila:'24',date:'2026-03-13',bull:'Bhura',status:'',note:''},
+      {id:113,shed:'8/2',month:'2026-03',bufId:'1842',khila:'43',date:'2026-03-14',bull:'Jafoa',status:'R',note:''},
+      {id:114,shed:'8/2',month:'2026-03',bufId:'462',khila:'38',date:'2026-03-15',bull:'Jafoa',status:'',note:''},
+      {id:115,shed:'8/2',month:'2026-03',bufId:'1893',khila:'62',date:'2026-03-16',bull:'Bhura',status:'',note:''},
+      {id:116,shed:'8/2',month:'2026-03',bufId:'1477',khila:'46',date:'2026-03-17',bull:'82',status:'',note:''},
+      {id:117,shed:'8/2',month:'2026-03',bufId:'1470',khila:'35',date:'2026-03-18',bull:'Jafoa',status:'',note:''},
+      {id:118,shed:'8/2',month:'2026-03',bufId:'1892',khila:'56',date:'2026-03-19',bull:'34',status:'R',note:''},
+      {id:119,shed:'8/2',month:'2026-03',bufId:'547',khila:'3',date:'2026-03-21',bull:'Baccha',status:'R',note:''},
+      {id:120,shed:'8/2',month:'2026-03',bufId:'1852',khila:'76',date:'2026-03-22',bull:'50',status:'R',note:''},
+      {id:121,shed:'8/2',month:'2026-03',bufId:'1675',khila:'52',date:'2026-03-23',bull:'34',status:'',note:''},
+      {id:122,shed:'8/2',month:'2026-03',bufId:'NIL',khila:'16',date:'2026-03-24',bull:'Jafoa',status:'P',note:''},
+      {id:123,shed:'8/2',month:'2026-03',bufId:'1803',khila:'53',date:'2026-03-25',bull:'Baccha',status:'',note:''},
+      {id:124,shed:'8/2',month:'2026-03',bufId:'1702',khila:'32',date:'2026-03-27',bull:'82',status:'',note:''},
+      {id:125,shed:'8/2',month:'2026-03',bufId:'1109',khila:'84',date:'2026-03-31',bull:'34',status:'R',note:''},
+      // ─── 8/1 APRIL ───
+      {id:201,shed:'8/1',month:'2026-04',bufId:'1898',khila:'40',date:'2026-04-01',bull:'50',status:'R',note:''},
+      {id:202,shed:'8/1',month:'2026-04',bufId:'1489',khila:'61',date:'2026-04-01',bull:'82',status:'',note:''},
+      {id:203,shed:'8/1',month:'2026-04',bufId:'1694',khila:'67',date:'2026-04-01',bull:'66',status:'',note:''},
+      {id:204,shed:'8/1',month:'2026-04',bufId:'1800',khila:'76',date:'2026-04-01',bull:'Ino',status:'',note:''},
+      {id:205,shed:'8/1',month:'2026-04',bufId:'1811',khila:'44',date:'2026-04-02',bull:'50',status:'R',note:''},
+      {id:206,shed:'8/1',month:'2026-04',bufId:'1028',khila:'48',date:'2026-04-02',bull:'82',status:'',note:''},
+      {id:207,shed:'8/1',month:'2026-04',bufId:'1367',khila:'60',date:'2026-04-02',bull:'Baccha',status:'R',note:''},
+      {id:208,shed:'8/1',month:'2026-04',bufId:'1667',khila:'91',date:'2026-04-08',bull:'66',status:'R',note:''},
+      {id:209,shed:'8/1',month:'2026-04',bufId:'1429',khila:'46',date:'2026-04-08',bull:'50',status:'',note:''},
+      {id:210,shed:'8/1',month:'2026-04',bufId:'1398',khila:'81',date:'2026-04-08',bull:'66',status:'',note:''},
+      {id:213,shed:'8/1',month:'2026-04',bufId:'304',khila:'77',date:'2026-04-11',bull:'82',status:'R',note:''},
+      {id:228,shed:'8/1',month:'2026-04',bufId:'1650',khila:'30',date:'2026-04-30',bull:'AI',status:'',note:''},
+      // ─── 8/2 APRIL ───
+      {id:301,shed:'8/2',month:'2026-04',bufId:'1674',khila:'47',date:'2026-04-01',bull:'Jafoa',status:'',note:''},
+      {id:302,shed:'8/2',month:'2026-04',bufId:'1204',khila:'89',date:'2026-04-02',bull:'34',status:'',note:''},
+      {id:303,shed:'8/2',month:'2026-04',bufId:'1833',khila:'12',date:'2026-04-05',bull:'B',status:'',note:''},
+      {id:306,shed:'8/2',month:'2026-04',bufId:'1816',khila:'96',date:'2026-04-08',bull:'82',status:'R',note:''},
+      {id:308,shed:'8/2',month:'2026-04',bufId:'1676',khila:'20',date:'2026-04-11',bull:'34',status:'R',note:''},
+      {id:314,shed:'8/2',month:'2026-04',bufId:'1852',khila:'76',date:'2026-04-20',bull:'34',status:'R',note:''},
+      // ─── 8/1 MAY ───
+      {id:401,shed:'8/1',month:'2026-05',bufId:'1171',khila:'64',date:'2026-05-01',bull:'Bhura',status:'',note:''},
+      {id:402,shed:'8/1',month:'2026-05',bufId:'1218',khila:'5',date:'2026-05-01',bull:'66',status:'',note:''},
+      {id:403,shed:'8/1',month:'2026-05',bufId:'1114',khila:'17',date:'2026-05-02',bull:'66',status:'',note:''},
+      {id:404,shed:'8/1',month:'2026-05',bufId:'1630',khila:'11',date:'2026-05-02',bull:'Baccha',status:'',note:''},
+      {id:405,shed:'8/1',month:'2026-05',bufId:'1811',khila:'44',date:'2026-05-05',bull:'Bhura',status:'',note:''},
+      {id:406,shed:'8/1',month:'2026-05',bufId:'1677',khila:'8',date:'2026-05-07',bull:'Baccha',status:'',note:''},
+      {id:407,shed:'8/1',month:'2026-05',bufId:'1448',khila:'57',date:'2026-05-09',bull:'50',status:'',note:''},
+      {id:408,shed:'8/1',month:'2026-05',bufId:'304',khila:'77',date:'2026-05-11',bull:'66',status:'',note:''},
+      {id:409,shed:'8/1',month:'2026-05',bufId:'1669',khila:'4',date:'2026-05-12',bull:'Baccha',status:'',note:''},
+      // ─── 8/2 MAY ───
+      {id:501,shed:'8/2',month:'2026-05',bufId:'1604',khila:'5',date:'2026-05-01',bull:'Ino',status:'',note:''},
+      {id:502,shed:'8/2',month:'2026-05',bufId:'1892',khila:'56',date:'2026-05-02',bull:'34',status:'',note:''},
+      {id:503,shed:'8/2',month:'2026-05',bufId:'1342',khila:'94',date:'2026-05-03',bull:'1',status:'',note:''},
+      {id:504,shed:'8/2',month:'2026-05',bufId:'1092',khila:'8',date:'2026-05-04',bull:'82',status:'',note:''},
+      {id:505,shed:'8/2',month:'2026-05',bufId:'1067',khila:'51',date:'2026-05-05',bull:'17',status:'',note:''},
+      {id:506,shed:'8/2',month:'2026-05',bufId:'1226',khila:'83',date:'2026-05-07',bull:'66',status:'',note:''},
+      {id:507,shed:'8/2',month:'2026-05',bufId:'1676',khila:'20',date:'2026-05-08',bull:'1',status:'',note:''},
+      {id:508,shed:'8/2',month:'2026-05',bufId:'1898',khila:'16',date:'2026-05-09',bull:'17',status:'',note:''},
+      {id:509,shed:'8/2',month:'2026-05',bufId:'1852',khila:'76',date:'2026-05-11',bull:'82',status:'',note:''},
+      {id:510,shed:'8/2',month:'2026-05',bufId:'1858',khila:'10',date:'2026-05-12',bull:'50',status:'',note:''},
+      {id:511,shed:'8/2',month:'2026-05',bufId:'1670',khila:'88',date:'2026-05-13',bull:'',status:'',note:''},
+    ],
+    milkCust: [], milkBuf: [],
+    stock: [
+      {id:'s1',n:'D.D.G.S',b:70,u:'bags'},{id:'s2',n:'D.O.C',b:150,u:'bags'},
+      {id:'s3',n:'Tuwar',b:124,u:'bags'},{id:'s4',n:'Makai',b:220,u:'bags'},
+      {id:'s5',n:'M.Chala',b:116,u:'bags'},{id:'s6',n:'Chana',b:64,u:'bags'},
+      {id:'s7',n:'Kunda',b:37,u:'bags'},{id:'s8',n:'Soya',b:276,u:'bags'},
+      {id:'s9',n:'Kutti',b:134,u:'bags'},{id:'s10',n:'Biscuit',b:35,u:'bags'},
+      {id:'s11',n:'Pinda',b:240,u:'bags'},{id:'s12',n:'Tel',b:440,u:'L'},
+      {id:'s13',n:'Cane',b:38,u:'bundles'},{id:'s14',n:'Jawari',b:86,u:'bags'},
+      {id:'s15',n:'Bacche 8/1',b:14,u:'calves'},{id:'s16',n:'Bacche 8/2',b:10,u:'calves'},
+    ],
+    stockLog: [],
+    gujBuf: [
+      ...Array.from({length:17},(_,i)=>({id:`gt${i+1}`,care:'Tosif',bufId:`T${1000+i}`,out:'2026-03-01',fali:'',status:'active'})),
+      ...Array.from({length:38},(_,i)=>({id:`gn${i+1}`,care:'Noora',bufId:`N${2000+i}`,out:'2026-03-01',fali:'',status:'active'})),
+    ],
+    deaths: [{id:'d1',bufId:'1263',care:'Noora',date:'2026-05-15',val:100000,note:'Bhais Mari'}],
+    careBills: [], transport: [],
+    workers: [
+      {id:'w1',name:'Milker 1',shed:'8/1',type:'milking',sal:0},{id:'w2',name:'Milker 2',shed:'8/1',type:'milking',sal:0},
+      {id:'w3',name:'Milker 3',shed:'8/1',type:'milking',sal:0},{id:'w4',name:'Milker 4',shed:'8/1',type:'milking',sal:0},
+      {id:'w5',name:'Milker 5',shed:'8/1',type:'milking',sal:0},{id:'w6',name:'Milker 6',shed:'8/1',type:'milking',sal:0},
+      {id:'w7',name:'Gobar 1',shed:'8/1',type:'gobar',sal:0},{id:'w8',name:'Gobar 2',shed:'8/1',type:'gobar',sal:0},
+      {id:'w9',name:'Gobar 3',shed:'8/1',type:'gobar',sal:0},{id:'w10',name:'Gobar 4',shed:'8/1',type:'gobar',sal:0},
+      {id:'w11',name:'Milker 1',shed:'8/2',type:'milking',sal:0},{id:'w12',name:'Milker 2',shed:'8/2',type:'milking',sal:0},
+      {id:'w13',name:'Milker 3',shed:'8/2',type:'milking',sal:0},{id:'w14',name:'Milker 4',shed:'8/2',type:'milking',sal:0},
+      {id:'w15',name:'Milker 5',shed:'8/2',type:'milking',sal:0},{id:'w16',name:'Milker 6',shed:'8/2',type:'milking',sal:0},
+      {id:'w17',name:'Gobar 1',shed:'8/2',type:'gobar',sal:0},{id:'w18',name:'Gobar 2',shed:'8/2',type:'gobar',sal:0},
+      {id:'w19',name:'Gobar 3',shed:'8/2',type:'gobar',sal:0},{id:'w20',name:'Gobar 4',shed:'8/2',type:'gobar',sal:0},
+      {id:'w21',name:'Manager 8/1',shed:'both',type:'manager',sal:0},{id:'w22',name:'Manager 8/2',shed:'both',type:'manager',sal:0},
+      {id:'w23',name:'Driver',shed:'both',type:'driver',sal:0},{id:'w24',name:'Cook',shed:'both',type:'cook',sal:0},
+    ],
+    attendance: [], salaries: [],
+    purchases: [], slaughter: [], expenses: [], feedPurchases: [], brokers: [],
+    khila: {'8/1':{},'8/2':{},'8/1-PL':[],'8/1-PR':[],'8/2-PL':[],'8/2-PR':[]},
+  };
+}
+
+function save(){ try{ localStorage.setItem('bdf_v4',JSON.stringify(DB)); localStorage.setItem('bdf_id4',_id); }catch(e){} }
+function load(){
+  try{
+    const s=localStorage.getItem('bdf_v4');
+    if(s){ DB={...initDB()||{}, ...JSON.parse(s)}; _id=parseInt(localStorage.getItem('bdf_id4')||'8000'); return; }
+  }catch(e){}
+  initDB();
+}
+
+/* ═══════════════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════════════ */
+const lastF  = bid => [...DB.fali].filter(f=>f.bufId===bid).sort((a,b)=>b.date.localeCompare(a.date))[0];
+const is3m   = bid => { const f=lastF(bid); return f?dAgo(f.date)>90:false; };
+const isK    = bid => lastF(bid)?.status==='K';
+const isP    = bid => lastF(bid)?.status==='P';
+
+function sBadge(s){
+  if(s==='R') return '<span class="badge b-red">↩ R</span>';
+  if(s==='P') return '<span class="badge b-blue">✅ P</span>';
+  if(s==='K') return '<span class="badge b-amber">🔵 Khali</span>';
+  if(s==='Bimar') return '<span class="badge b-amber">🤒 Bimar</span>';
+  return '<span class="badge b-gray">—</span>';
+}
+function pBadge(paid,total){
+  if(!total) return '';
+  if(paid>=total) return '<span class="badge b-green">PAID</span>';
+  if(paid>0)      return '<span class="badge b-amber">PART</span>';
+  return '<span class="badge b-red">DUE</span>';
+}
+
+let toastT;
+function toast(msg,type='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=type==='err'?'show err':'show';
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2400);
+}
+function openModal(title,body,actions=''){
+  document.getElementById('m-title').textContent=title;
+  document.getElementById('m-body').innerHTML=body;
+  document.getElementById('m-actions').innerHTML=actions;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+
+/* ═══════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════ */
+const PAGE_TITLES = {dash:'Dashboard',fali:'Fali Book',khila:'Khila Book',milk:'Milk Register',
+  stock:'Feed Stock',gujarat:'Gujarat / Falat',labour:'Labour Register',accounts:'Accounts',
+  monthly:'Monthly Report',yearly:'Yearly Report',more:'More'};
+
+let curPage='dash', curMonth='2026-05';
+let fShed='8/1', fMonth='2026-05', fFilter='all';
+let mFilter='all', kShed='8/1';
+
+function nav(page){
+  curPage=page;
+  // Desktop nav items
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  const navBtn=[...document.querySelectorAll('.nav-item')].find(b=>b.getAttribute('onclick')?.includes(`'${page}'`));
+  if(navBtn) navBtn.classList.add('active');
+  // Mobile tabs
+  document.querySelectorAll('.mt-item').forEach(b=>b.classList.remove('active'));
+  const mBtn=[...document.querySelectorAll('.mt-item')].find(b=>b.getAttribute('onclick')?.includes(`'${page}'`));
+  if(mBtn) mBtn.classList.add('active');
+  // Pages
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pageEl=document.getElementById('page-'+page);
+  if(pageEl){ pageEl.classList.add('active'); renderPage(page); }
+  document.getElementById('page-title').textContent=PAGE_TITLES[page]||page;
+  document.getElementById('content').scrollTop=0;
+  updateAlertBadge();
+}
+
+function setGlobalMonth(m){
+  curMonth=m; fMonth=m;
+  const el=document.getElementById('global-month');
+  if(el) el.value=m;
+  renderPage(curPage);
+}
+
+function renderPage(p){
+  const el=document.getElementById('page-'+p); if(!el) return;
+  const R={
+    dash:    renderDash, fali:    renderFali, khila:   renderKhila,
+    milk:    renderMilk, stock:   renderStock, gujarat: renderGujarat,
+    labour:  renderLabour, accounts:renderAccounts, monthly: renderMonthly,
+    yearly:  renderYearly, more:    renderMore,
+  };
+  if(R[p]) R[p](el);
+}
+
+function updateAlertBadge(){
+  const allBufs=[...new Set(DB.fali.map(f=>f.bufId))];
+  const over=allBufs.filter(b=>is3m(b)).length;
+  const nb=document.getElementById('nb-fali');
+  if(nb){ nb.style.display=over?'':'none'; nb.textContent=over; }
+}
+
+function updateSidebarFooter(){
+  const t=DB.gujBuf.filter(b=>b.care==='Tosif'&&b.status==='active').length;
+  const n=DB.gujBuf.filter(b=>b.care==='Noora'&&b.status==='active').length;
+  document.getElementById('sf-tosif').textContent=t;
+  document.getElementById('sf-noora').textContent=n;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SEARCH
+═══════════════════════════════════════════════════════ */
+function doSearch(q){
+  if(!q||q.length<2){ if(curPage!=='dash') return; renderPage(curPage); return; }
+  const el=document.getElementById('page-'+curPage); if(!el) return;
+  const matches=DB.fali.filter(f=>f.bufId.includes(q)||f.khila.toString().includes(q)||f.bull.toLowerCase().includes(q.toLowerCase()));
+  el.innerHTML=`
+    <div class="sec-label">🔍 Search: "${q}" — ${matches.length} results</div>
+    <div class="card">
+      ${matches.length===0?'<div class="empty"><div class="ei">🔍</div><div class="et">No results found</div></div>':`
+      <table class="tbl">
+        <thead><tr><th>Bhais</th><th>Khila</th><th>Shed</th><th>Month</th><th>Date</th><th>Bull</th><th>Status</th></tr></thead>
+        <tbody>${matches.map(f=>`<tr onclick="openFaliModal(${f.id})">
+          <td class="fw7 tg mono">${f.bufId}</td>
+          <td class="tm mono">${f.khila}</td>
+          <td>${f.shed}</td><td>${ml(f.month)}</td>
+          <td class="mono small">${fd(f.date)}</td>
+          <td>${f.bull||'—'}</td>
+          <td>${sBadge(f.status)}</td>
+        </tr>`).join('')}</tbody>
+      </table>`}
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PILL / MONTH HELPERS
+═══════════════════════════════════════════════════════ */
+function mPills(active,fn){
+  return `<div class="pill-row">${C.MONTHS.map(m=>`<span class="pill ${m===active?'on':''}" onclick="${fn}('${m}')">${ml(m)}</span>`).join('')}</div>`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════════ */
+function renderDash(el){
+  const mkM=DB.milkCust.filter(r=>r.month===curMonth);
+  const totL=mkM.reduce((s,r)=>s+r.litres,0);
+  const totV=mkM.reduce((s,r)=>s+r.value,0);
+  const fM=DB.fali.filter(f=>f.month===curMonth);
+  const preg=DB.fali.filter(f=>f.status==='P');
+  const khali=DB.fali.filter(f=>f.status==='K');
+  const allBufs=[...new Set(DB.fali.map(f=>f.bufId))];
+  const over3m=allBufs.filter(b=>is3m(b));
+  const tosif=DB.gujBuf.filter(b=>b.care==='Tosif'&&b.status==='active').length;
+  const noora=DB.gujBuf.filter(b=>b.care==='Noora'&&b.status==='active').length;
+  const days=15;
+
+  el.innerHTML=`
+    ${mPills(curMonth,'setGlobalMonth')}
+
+    <div class="content-cols" style="display:flex;gap:20px">
+      <div style="flex:1;min-width:0">
+
+        <div class="sec-label">🐃 Herd Status</div>
+        <div class="stat-grid grid-4">
+          <div class="stat-card" onclick="nav('fali')"><div class="sc-num">108</div><div class="sc-label">Shed 8/1 — Saddam</div></div>
+          <div class="stat-card" onclick="nav('fali')"><div class="sc-num">104</div><div class="sc-label">Shed 8/2 — Hussain</div></div>
+          <div class="stat-card warn" onclick="nav('gujarat')"><div class="sc-num amber">${tosif}</div><div class="sc-label">Gujarat · Tosif</div><div class="sc-sub">₹3,100/mo · Manpura</div></div>
+          <div class="stat-card warn" onclick="nav('gujarat')"><div class="sc-num amber">${noora}</div><div class="sc-label">Gujarat · Noora</div><div class="sc-sub">₹3,300/mo</div></div>
+        </div>
+        <div class="stat-grid grid-3">
+          <div class="stat-card"><div class="sc-num">267</div><div class="sc-label">Total Bhais</div></div>
+          <div class="stat-card"><div class="sc-num teal">6</div><div class="sc-label">Pada (Male Bulls)</div></div>
+          <div class="stat-card"><div class="sc-num blue">24</div><div class="sc-label">Bacche (Calves)</div></div>
+        </div>
+
+        <div class="sec-label">🥛 Milk — ${mll(curMonth)}</div>
+        <div class="stat-grid grid-4">
+          <div class="stat-card" onclick="nav('milk')"><div class="sc-num teal">${totL||'—'}</div><div class="sc-label">Month Litres</div></div>
+          <div class="stat-card" onclick="nav('milk')"><div class="sc-num teal">${totL?Math.round(totL/days):'—'}</div><div class="sc-label">Daily Average</div></div>
+          <div class="stat-card" onclick="nav('milk')"><div class="sc-num teal">${totL?Math.round(totL/days*7):'—'}</div><div class="sc-label">Weekly Est.</div></div>
+          <div class="stat-card" onclick="nav('milk')"><div class="sc-num" style="color:var(--green)">₹${fmt(totV)}</div><div class="sc-label">Month Income</div></div>
+        </div>
+
+        <div class="sec-label">🐂 Fali Status — ${mll(curMonth)}</div>
+        <div class="stat-grid grid-4">
+          <div class="stat-card" onclick="nav('fali')"><div class="sc-num">${fM.length}</div><div class="sc-label">Total Entries</div></div>
+          <div class="stat-card" onclick="fFilter='P';nav('fali')"><div class="sc-num blue">${preg.length}</div><div class="sc-label">Pregnant ✅</div></div>
+          <div class="stat-card warn" onclick="fFilter='K';nav('fali')"><div class="sc-num amber">${khali.length}</div><div class="sc-label">Khali 🔵</div></div>
+          <div class="stat-card ${over3m.length?'danger':''}" onclick="fFilter='3m';nav('fali')"><div class="sc-num ${over3m.length?'red':''}">${over3m.length}</div><div class="sc-label">3M+ Overdue ⚠️</div></div>
+        </div>
+
+        ${over3m.length?`
+        <div class="sec-label">⚠️ Needs Immediate Service</div>
+        ${over3m.slice(0,5).map(bid=>{const f=lastF(bid);return`<div class="alert-row al-orange" onclick="openFaliModal(${f?.id||0})">
+          <div><div class="ar-title">🐃 Buffalo #${bid} · Shed ${f?.shed||'?'} · Khila ${f?.khila||'?'}</div><div class="ar-sub">Last fali: ${fd(f?.date)} · Bull: ${f?.bull}</div></div>
+          <div class="ar-right">${dAgo(f?.date||C.TODAY)} days<br>since service</div>
+        </div>`;}).join('')}
+        ${over3m.length>5?`<div class="alert-row al-orange"><div class="ar-title">+ ${over3m.length-5} more buffalo overdue</div></div>`:''}`:''}
+
+        ${khali.length?`
+        <div class="sec-label">🔵 Khali — Needs Service</div>
+        ${khali.slice(0,4).map(f=>`<div class="alert-row al-amber" onclick="openFaliModal(${f.id})">
+          <div><div class="ar-title">🐃 #${f.bufId} · Khila ${f.khila} · Shed ${f.shed}</div><div class="ar-sub">Last bull: ${f.bull} · ${fd(f.date)}</div></div>
+          <div class="ar-right">${dAgo(f.date)} days ago</div>
+        </div>`).join('')}`:''}
+
+      </div>
+
+      <div style="width:300px;flex-shrink:0" class="col-right">
+        <div class="sec-label">💰 Month P&L</div>
+        ${calcPL(curMonth)}
+
+        <div class="sec-label">📦 Low Stock Alert</div>
+        <div class="card">
+          ${DB.stock.filter(s=>s.b<40).length===0?`<div class="empty" style="padding:16px"><div class="et">All stock levels OK ✅</div></div>`:
+          `<table class="tbl"><thead><tr><th>Item</th><th>Balance</th></tr></thead>
+          <tbody>${DB.stock.filter(s=>s.b<40).map(s=>`<tr><td class="fw7">${s.n}</td><td class="fw7 ${s.b<20?'tr':'ta'} mono">${s.b} ${s.u}</td></tr>`).join('')}</tbody></table>`}
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   FALI BOOK
+═══════════════════════════════════════════════════════ */
+function renderFali(el){
+  let list=DB.fali.filter(f=>f.shed===fShed&&f.month===fMonth);
+  if(fFilter==='R') list=list.filter(f=>f.status==='R');
+  else if(fFilter==='P') list=list.filter(f=>f.status==='P');
+  else if(fFilter==='K') list=list.filter(f=>f.status==='K');
+  else if(fFilter==='') list=list.filter(f=>!f.status);
+  else if(fFilter==='3m') list=DB.fali.filter(f=>f.shed===fShed&&is3m(f.bufId));
+  list.sort((a,b)=>a.date.localeCompare(b.date));
+
+  el.innerHTML=`
+    <div class="content-cols" style="display:flex;gap:20px">
+      <div style="flex:1;min-width:0">
+        <div class="pill-row">
+          <span class="pill ${fShed==='8/1'?'on':''}" onclick="fShed='8/1';renderFali(document.getElementById('page-fali'))">Shed 8/1 (Saddam)</span>
+          <span class="pill ${fShed==='8/2'?'on':''}" onclick="fShed='8/2';renderFali(document.getElementById('page-fali'))">Shed 8/2 (Hussain)</span>
+        </div>
+        ${mPills(fMonth,m=>`{fMonth='${m}';curMonth='${m}';renderFali(document.getElementById('page-fali'))}`)}
+        <div class="pill-row">
+          <span class="pill ${fFilter==='all'?'on':''}" onclick="fFilter='all';renderFali(document.getElementById('page-fali'))">All (${DB.fali.filter(f=>f.shed===fShed&&f.month===fMonth).length})</span>
+          <span class="pill ${fFilter==='R'?'on-red':''}" onclick="fFilter='R';renderFali(document.getElementById('page-fali'))">↩ Returned</span>
+          <span class="pill ${fFilter==='P'?'on':''}" onclick="fFilter='P';renderFali(document.getElementById('page-fali'))">✅ Pregnant</span>
+          <span class="pill ${fFilter==='K'?'on-amber':''}" onclick="fFilter='K';renderFali(document.getElementById('page-fali'))">🔵 Khali</span>
+          <span class="pill ${fFilter===''?'on':''}" onclick="fFilter='';renderFali(document.getElementById('page-fali'))">⬜ Pending</span>
+          <span class="pill ${fFilter==='3m'?'on-red':''}" onclick="fFilter='3m';renderFali(document.getElementById('page-fali'))">⚠️ 3M+ Overdue</span>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Shed ${fShed} · ${mll(fMonth)}</div>
+            <div class="card-meta">${list.length} entries</div>
+          </div>
+          ${list.length===0?'<div class="empty"><div class="ei">📋</div><div class="et">No entries found</div></div>':`
+          <table class="tbl">
+            <thead><tr><th>Bhais No</th><th>Khila</th><th>Date</th><th>Bull</th><th>Status</th><th>Note</th><th>Days</th></tr></thead>
+            <tbody>${list.map(f=>{
+              const rowC=f.status==='K'?'r-warn':is3m(f.bufId)?'r-alert':f.status==='P'?'r-blue':'';
+              return `<tr class="${rowC}" onclick="openFaliModal(${f.id})">
+                <td class="fw7 tg mono">${f.bufId}${isK(f.bufId)?' 🔵':''}</td>
+                <td class="tm mono">${f.khila}</td>
+                <td class="mono small">${fd(f.date)}</td>
+                <td>${f.bull||'—'}</td>
+                <td>${sBadge(f.status)}</td>
+                <td class="tm small">${f.note||'—'}</td>
+                <td class="mono small ${dAgo(f.date)>90?'tr':''}">${dAgo(f.date)}d</td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>`}
+        </div>
+      </div>
+
+      <div style="width:320px;flex-shrink:0">
+        <div class="sec-label">➕ New Entry</div>
+        <div class="form-section">
+          <h3>Add Fali Record</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Bhais No</label><input id="nf-buf" placeholder="e.g. 1609" oninput="autoFali(this.value)"></div>
+            <div class="form-group"><label>Khila No</label><input id="nf-kh" placeholder="e.g. 29"></div>
+          </div>
+          <div id="nf-hint" style="display:none;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.25);border-radius:8px;padding:10px;margin-bottom:10px;font-size:11px;font-family:var(--mono);color:var(--amber);line-height:1.5"></div>
+          <div class="form-row">
+            <div class="form-group"><label>Date</label><input type="date" id="nf-date" value="${C.TODAY}"></div>
+            <div class="form-group"><label>Bull</label><select id="nf-bull">${C.BULLS.map(b=>`<option>${b}</option>`).join('')}</select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Status</label>
+              <select id="nf-status"><option value="">Pending</option><option value="R">R — Returned</option><option value="P">P — Pregnant</option><option value="K">Khali</option><option value="Bimar">Bimar</option></select>
+            </div>
+            <div class="form-group"><label>Month</label>
+              <select id="nf-month">${C.MONTHS.map(m=>`<option value="${m}" ${m===fMonth?'selected':''}>${mll(m)}</option>`).join('')}</select>
+            </div>
+          </div>
+          <div class="form-row one"><div class="form-group"><label>Note</label><input id="nf-note" placeholder="Paid, doctor date..."></div></div>
+          <button class="btn btn-primary btn-full" onclick="saveFali()">💾 Save Fali Entry</button>
+        </div>
+
+        <div class="sec-label">✏️ Quick Correct</div>
+        <div class="form-section">
+          <h3>Manual Correction</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Buffalo ID</label><input id="fc-buf" placeholder="e.g. 1609"></div>
+            <div class="form-group"><label>Field</label>
+              <select id="fc-field"><option value="bull">Bull</option><option value="status">Status</option><option value="date">Date</option><option value="khila">Khila</option><option value="note">Note</option></select>
+            </div>
+          </div>
+          <div class="form-row one"><div class="form-group"><label>New Value</label><input id="fc-val" placeholder="new value"></div></div>
+          <button class="btn btn-ghost btn-full" onclick="correctFali()">✏️ Apply Correction</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+window.autoFali=bid=>{
+  const hint=document.getElementById('nf-hint'); if(!hint) return;
+  if(!bid||bid.length<2){hint.style.display='none';return;}
+  const last=lastF(bid);
+  if(!last){hint.style.display='none';return;}
+  hint.style.display='block';
+  hint.innerHTML=`⚡ Last: ${fd(last.date)} · Bull: ${last.bull} · ${sBadge(last.status)} · ${dAgo(last.date)} days ago · Khila: ${last.khila}`;
+  const kh=document.getElementById('nf-kh'); if(kh&&!kh.value) kh.value=last.khila||'';
+  if(last.status==='R'){const nn=document.getElementById('nf-note');if(nn&&!nn.value)nn.value=`Re-service after R on ${fd(last.date)}`;}
+};
+window.saveFali=()=>{
+  const bufId=document.getElementById('nf-buf').value.trim();
+  const khila=document.getElementById('nf-kh').value.trim();
+  const date=document.getElementById('nf-date').value;
+  const bull=document.getElementById('nf-bull').value;
+  const status=document.getElementById('nf-status').value;
+  const month=document.getElementById('nf-month').value;
+  const note=document.getElementById('nf-note').value.trim();
+  if(!bufId){toast('Enter buffalo ID','err');return;}
+  DB.fali.push({id:uid(),shed:fShed,month,bufId,khila,date,bull,status,note});
+  save(); toast('✅ Fali entry saved');
+  ['nf-buf','nf-kh','nf-note'].forEach(x=>{try{document.getElementById(x).value='';}catch(e){}});
+  try{document.getElementById('nf-hint').style.display='none';}catch(e){}
+  renderFali(document.getElementById('page-fali'));
+  updateAlertBadge();
+};
+window.correctFali=()=>{
+  const bid=document.getElementById('fc-buf').value.trim();
+  const field=document.getElementById('fc-field').value;
+  const val=document.getElementById('fc-val').value.trim();
+  if(!bid||!val){toast('Enter buffalo ID and value','err');return;}
+  const last=lastF(bid);
+  if(!last){toast('No fali record found','err');return;}
+  last[field]=val; save(); toast(`✅ Corrected: #${bid} ${field}=${val}`);
+  renderFali(document.getElementById('page-fali'));
+};
+window.openFaliModal=id=>{
+  const f=DB.fali.find(r=>r.id===id); if(!f) return;
+  const warn=is3m(f.bufId)?`<div style="background:rgba(255,112,67,0.1);border:1px solid rgba(255,112,67,0.3);border-radius:8px;padding:10px;margin-bottom:14px;color:var(--orange);font-size:12px">⚠️ ${dAgo(f.date)} days since last service — overdue!</div>`:'';
+  const khaliWarn=f.status==='K'?`<div style="background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.3);border-radius:8px;padding:10px;margin-bottom:14px;color:var(--amber);font-size:12px">🔵 Khali — Needs service urgently. Will be highlighted until serviced.</div>`:'';
+  const form=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+      <div class="form-group"><label>Bull</label><select id="sh-bull">${C.BULLS.map(b=>`<option ${b===f.bull?'selected':''}>${b}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Status</label><select id="sh-st"><option value="" ${!f.status?'selected':''}>Pending</option><option value="R" ${f.status==='R'?'selected':''}>R — Returned</option><option value="P" ${f.status==='P'?'selected':''}>P — Pregnant</option><option value="K" ${f.status==='K'?'selected':''}>K — Khali</option><option value="Bimar" ${f.status==='Bimar'?'selected':''}>Bimar</option></select></div>
+      <div class="form-group"><label>Date</label><input type="date" id="sh-date" value="${f.date}"></div>
+      <div class="form-group"><label>Khila No</label><input id="sh-kh" value="${f.khila||''}"></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Note</label><input id="sh-note" value="${f.note||''}"></div>
+    </div>`;
+  openModal(`Buffalo #${f.bufId}`,`${warn}${khaliWarn}
+    <div class="modal-row"><span class="mr-label">Buffalo ID</span><span class="mr-value tg">${f.bufId}</span></div>
+    <div class="modal-row"><span class="mr-label">Shed</span><span class="mr-value">Shed ${f.shed}</span></div>
+    <div class="modal-row"><span class="mr-label">Khila</span><span class="mr-value">${f.khila}</span></div>
+    <div class="modal-row"><span class="mr-label">Fali Date</span><span class="mr-value">${fd(f.date)}</span></div>
+    <div class="modal-row"><span class="mr-label">Bull</span><span class="mr-value">${f.bull||'—'}</span></div>
+    <div class="modal-row"><span class="mr-label">Status</span><span class="mr-value">${sBadge(f.status)}</span></div>
+    <div class="modal-row"><span class="mr-label">Days Since</span><span class="mr-value ${dAgo(f.date)>90?'tr':''}">${dAgo(f.date)} days</span></div>
+    <div class="modal-row"><span class="mr-label">Month</span><span class="mr-value">${mll(f.month)}</span></div>
+    <div class="modal-row"><span class="mr-label">Note</span><span class="mr-value">${f.note||'—'}</span></div>
+    ${form}`,
+    `<button style="background:rgba(0,224,122,0.15);color:var(--green)" onclick="saveFaliEdit(${id})">✅ Save Changes</button>
+     <button style="background:rgba(255,71,87,0.15);color:var(--red)" onclick="delFali(${id})">🗑 Delete</button>`);
+};
+window.saveFaliEdit=id=>{
+  const f=DB.fali.find(r=>r.id===id); if(!f) return;
+  f.bull=document.getElementById('sh-bull').value;
+  f.status=document.getElementById('sh-st').value;
+  f.date=document.getElementById('sh-date').value;
+  f.khila=document.getElementById('sh-kh').value;
+  f.note=document.getElementById('sh-note').value;
+  save(); closeModal(); toast('✅ Saved'); renderFali(document.getElementById('page-fali'));
+};
+window.delFali=id=>{if(!confirm('Delete?'))return;DB.fali=DB.fali.filter(r=>r.id!==id);save();closeModal();renderFali(document.getElementById('page-fali'));};
+
+/* ═══════════════════════════════════════════════════════
+   KHILA BOOK
+═══════════════════════════════════════════════════════ */
+function renderKhila(el){
+  const book=DB.khila[kShed]||{}, occ=Object.keys(book).length;
+  const pl=DB.khila[`${kShed}-PL`]||[], pr=DB.khila[`${kShed}-PR`]||[];
+
+  el.innerHTML=`
+    <div class="pill-row">
+      <span class="pill ${kShed==='8/1'?'on':''}" onclick="kShed='8/1';renderKhila(document.getElementById('page-khila'))">Shed 8/1 (Saddam)</span>
+      <span class="pill ${kShed==='8/2'?'on':''}" onclick="kShed='8/2';renderKhila(document.getElementById('page-khila'))">Shed 8/2 (Hussain)</span>
+    </div>
+
+    <div class="stat-grid grid-4">
+      <div class="stat-card"><div class="sc-num">${occ}</div><div class="sc-label">Occupied Khila</div></div>
+      <div class="stat-card"><div class="sc-num amber">${98-occ}</div><div class="sc-label">Empty Khila</div></div>
+      <div class="stat-card"><div class="sc-num purple">${pl.length}</div><div class="sc-label">Palaat Left</div></div>
+      <div class="stat-card"><div class="sc-num purple">${pr.length}</div><div class="sc-label">Palaat Right</div></div>
+    </div>
+
+    <div class="content-cols" style="display:flex;gap:16px">
+      <div style="flex:1;min-width:0">
+        <div class="sec-label">🏠 Khila Map — Shed ${kShed} — 98 Khila</div>
+        <div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px;flex-wrap:wrap">
+          <span style="color:var(--green)">● Active</span>
+          <span style="color:var(--amber)">● Khali</span>
+          <span style="color:var(--blue)">● Pregnant</span>
+          <span style="color:var(--orange)">● 3M+ Overdue</span>
+          <span style="color:var(--text3)">● Empty</span>
+        </div>
+        <div class="card">
+          <div class="khila-grid">
+            ${Array.from({length:98},(_,i)=>{
+              const k=i+1, bid=book[k];
+              const cls=!bid?'kc-empty':isK(bid)?'kc-khali':isP(bid)?'kc-pregnant':is3m(bid)?'kc-alert':'kc-active';
+              return `<div class="${cls} kc" title="${bid?`#${bid} · Khila ${k}`:`Empty Khila ${k}`}" onclick="openKhilaModal(${k},'${kShed}')">
+                <div class="kn">${k}</div>${bid?`<div class="ki">${bid.slice(-4)}</div>`:''}
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+
+        <div class="sec-label">🌿 Palaat Left — Shed ${kShed}</div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Palaat Left Side</div><div class="card-meta">${pl.length} buffalo</div></div>
+          ${pl.length===0?`<div class="empty" style="padding:16px"><div class="et">No buffalo on left palaat</div></div>`:`
+          <table class="tbl"><thead><tr><th>#</th><th>Buffalo ID</th><th>Status</th><th>Note</th><th></th></tr></thead>
+          <tbody>${pl.map((p,i)=>`<tr>
+            <td class="tm">${i+1}</td><td class="fw7 tg mono">${p.bufId}</td>
+            <td>${sBadge(lastF(p.bufId)?.status||'')}</td>
+            <td class="tm small">${p.note||'—'}</td>
+            <td><button class="btn-sm bsm-red" onclick="removeP('${kShed}','PL',${i})">✕</button></td>
+          </tr>`).join('')}</tbody></table>`}
+          <div style="padding:14px;border-top:1px solid var(--border)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+              <div class="form-group"><label>Buffalo ID</label><input id="pli" placeholder="e.g. 1234"></div>
+              <div class="form-group"><label>Note</label><input id="pln" placeholder="dry/delivery..."></div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="addP('${kShed}','PL')">+ Add to Palaat Left</button>
+          </div>
+        </div>
+
+        <div class="sec-label">🌿 Palaat Right — Shed ${kShed}</div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Palaat Right Side</div><div class="card-meta">${pr.length} buffalo</div></div>
+          ${pr.length===0?`<div class="empty" style="padding:16px"><div class="et">No buffalo on right palaat</div></div>`:`
+          <table class="tbl"><thead><tr><th>#</th><th>Buffalo ID</th><th>Status</th><th>Note</th><th></th></tr></thead>
+          <tbody>${pr.map((p,i)=>`<tr>
+            <td class="tm">${i+1}</td><td class="fw7 tg mono">${p.bufId}</td>
+            <td>${sBadge(lastF(p.bufId)?.status||'')}</td>
+            <td class="tm small">${p.note||'—'}</td>
+            <td><button class="btn-sm bsm-red" onclick="removeP('${kShed}','PR',${i})">✕</button></td>
+          </tr>`).join('')}</tbody></table>`}
+          <div style="padding:14px;border-top:1px solid var(--border)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+              <div class="form-group"><label>Buffalo ID</label><input id="pri" placeholder="e.g. 1234"></div>
+              <div class="form-group"><label>Note</label><input id="prn" placeholder="dry/delivery..."></div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="addP('${kShed}','PR')">+ Add to Palaat Right</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:280px;flex-shrink:0">
+        <div class="sec-label">🔄 Assign Buffalo</div>
+        <div class="form-section">
+          <h3>Assign to Khila</h3>
+          <div class="form-row one"><div class="form-group"><label>Buffalo ID</label><input id="ka-buf" placeholder="e.g. 1609"></div></div>
+          <div class="form-row one"><div class="form-group"><label>Khila No (1–98)</label><input type="number" id="ka-kh" placeholder="e.g. 29" min="1" max="98"></div></div>
+          <button class="btn btn-primary btn-full" onclick="assignK('${kShed}')">✅ Assign Khila</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+window.openKhilaModal=(k,s)=>{
+  const bid=DB.khila[s]?.[k]; const lf=bid?lastF(bid):null;
+  openModal(`Khila ${k} — Shed ${s}`,`
+    <div class="modal-row"><span class="mr-label">Khila No</span><span class="mr-value tg fw7">${k}</span></div>
+    <div class="modal-row"><span class="mr-label">Buffalo ID</span><span class="mr-value">${bid||'Empty'}</span></div>
+    ${lf?`<div class="modal-row"><span class="mr-label">Last Bull</span><span class="mr-value">${lf.bull}</span></div>
+    <div class="modal-row"><span class="mr-label">Last Fali</span><span class="mr-value">${fd(lf.date)}</span></div>
+    <div class="modal-row"><span class="mr-label">Status</span><span class="mr-value">${sBadge(lf.status)}</span></div>
+    <div class="modal-row"><span class="mr-label">Days Since</span><span class="mr-value ${dAgo(lf.date)>90?'tr':''}">${dAgo(lf.date)}d</span></div>`:''}
+    ${is3m(bid)?`<div style="margin:12px 0;padding:10px;background:rgba(255,112,67,0.1);border-radius:8px;color:var(--orange);font-size:12px">⚠️ ${dAgo(lf?.date||C.TODAY)} days since last service — overdue</div>`:''}
+    ${isK(bid)?`<div style="margin:12px 0;padding:10px;background:rgba(245,166,35,0.1);border-radius:8px;color:var(--amber);font-size:12px">🔵 Buffalo is Khali — needs service</div>`:''}
+    <div class="form-group" style="margin-top:14px"><label>New Buffalo ID</label><input id="kc-new" value="${bid||''}" placeholder="Enter buffalo ID"></div>`,
+    `<button style="background:rgba(0,224,122,0.15);color:var(--green)" onclick="saveKC(${k},'${s}')">✅ Save</button>
+     ${bid?`<button style="background:rgba(255,71,87,0.15);color:var(--red)" onclick="clearK(${k},'${s}')">✕ Clear</button>`:''}`);
+};
+window.saveKC=(k,s)=>{const v=document.getElementById('kc-new').value.trim();if(!v){toast('Enter ID','err');return;}if(!DB.khila[s])DB.khila[s]={};DB.khila[s][k]=v;save();closeModal();toast('✅ Assigned');renderKhila(document.getElementById('page-khila'));};
+window.clearK=(k,s)=>{delete DB.khila[s][k];save();closeModal();renderKhila(document.getElementById('page-khila'));};
+window.assignK=s=>{const bid=document.getElementById('ka-buf').value.trim();const k=parseInt(document.getElementById('ka-kh').value);if(!bid||!k){toast('Enter ID and khila','err');return;}if(k<1||k>98){toast('Khila must be 1-98','err');return;}if(!DB.khila[s])DB.khila[s]={};DB.khila[s][k]=bid;save();toast('✅ Assigned');renderKhila(document.getElementById('page-khila'));};
+window.addP=(s,side)=>{const iid=document.getElementById(side==='PL'?'pli':'pri').value.trim();const note=document.getElementById(side==='PL'?'pln':'prn').value.trim();if(!iid){toast('Enter ID','err');return;}if(!DB.khila[`${s}-${side}`])DB.khila[`${s}-${side}`]=[];DB.khila[`${s}-${side}`].push({bufId:iid,note});save();toast('✅ Added to palaat');renderKhila(document.getElementById('page-khila'));};
+window.removeP=(s,side,i)=>{DB.khila[`${s}-${side}`].splice(i,1);save();renderKhila(document.getElementById('page-khila'));};
+
+/* ═══════════════════════════════════════════════════════
+   MILK REGISTER
+═══════════════════════════════════════════════════════ */
+function renderMilk(el){
+  const recs=DB.milkCust.filter(r=>r.month===curMonth);
+  const filt=mFilter==='all'?recs:recs.filter(r=>r.customer===mFilter);
+  const totL=filt.reduce((s,r)=>s+r.litres,0);
+  const totV=filt.reduce((s,r)=>s+r.value,0);
+  const totR=filt.reduce((s,r)=>s+r.received,0);
+
+  el.innerHTML=`
+    ${mPills(curMonth,'setGlobalMonth')}
+    <div class="pill-row">
+      <span class="pill ${mFilter==='all'?'on':''}" onclick="mFilter='all';renderMilk(document.getElementById('page-milk'))">All Customers</span>
+      ${Object.keys(C.RATES).map(c=>`<span class="pill ${mFilter===c?'on':''}" onclick="mFilter='${c}';renderMilk(document.getElementById('page-milk'))">${c.split(' ')[0]}</span>`).join('')}
+    </div>
+
+    <div class="content-cols" style="display:flex;gap:20px">
+      <div style="flex:1;min-width:0">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Rate Card</div></div>
+          <table class="tbl">
+            <thead><tr><th>Customer</th><th>Route</th><th>Rate / Litre</th></tr></thead>
+            <tbody>
+              <tr><td>Sunrise Hotel</td><td><span class="badge b-amber">Route A</span></td><td class="fw7 tg mono">₹2.20</td></tr>
+              <tr><td>Shahi Hotel</td><td><span class="badge b-amber">Route A</span></td><td class="fw7 tg mono">₹2.20</td></tr>
+              <tr><td>Adil Hail</td><td><span class="badge b-amber">Route A</span></td><td class="fw7 tg mono">₹2.20</td></tr>
+              <tr><td>Mathura Dairy</td><td><span class="badge b-green">Route B</span></td><td class="fw7 tg mono">₹2.00</td></tr>
+              <tr><td>Mathura Foods</td><td><span class="badge b-green">Route B</span></td><td class="fw7 tg mono">₹2.00</td></tr>
+              <tr><td>Famous Hail</td><td><span class="badge b-green">Route B</span></td><td class="fw7 tg mono">₹2.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Supply Ledger — ${mll(curMonth)}</div>
+            <div class="card-meta">${filt.length} entries · ${totL}L · ₹${fmt(totV)}</div>
+          </div>
+          ${filt.length===0?`<div class="empty"><div class="ei">🥛</div><div class="et">No records yet. Add supply using the form.</div></div>`:`
+          <table class="tbl">
+            <thead><tr><th>Date</th><th>Customer</th><th>Morning</th><th>Evening</th><th>Litres</th><th>Rate</th><th>Value</th><th>Received</th><th>Status</th></tr></thead>
+            <tbody>${filt.map(r=>`<tr onclick="openMilkModal(${r.id})">
+              <td class="mono small">${fd(r.date)}</td>
+              <td style="font-size:12px">${r.customer}</td>
+              <td class="mono">${r.morning}L</td>
+              <td class="mono">${r.evening}L</td>
+              <td class="mono fw7">${r.litres}L</td>
+              <td class="mono">₹${r.rate}</td>
+              <td class="mono tg fw7">₹${fmt(r.value)}</td>
+              <td class="mono tm">₹${fmt(r.received)}</td>
+              <td>${pBadge(r.received,r.value)}</td>
+            </tr>`).join('')}</tbody>
+            <tfoot><tr><td colspan="4">TOTAL</td><td class="mono">${totL}L</td><td></td><td class="mono tg">₹${fmt(totV)}</td><td class="mono tm">₹${fmt(totR)}</td><td class="mono tr">₹${fmt(totV-totR)} due</td></tr></tfoot>
+          </table>`}
+        </div>
+      </div>
+
+      <div style="width:300px;flex-shrink:0">
+        <div class="sec-label">➕ Record Supply</div>
+        <div class="form-section">
+          <h3>🥛 Add Milk Entry</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Date</label><input type="date" id="ms-d" value="${C.TODAY}"></div>
+            <div class="form-group"><label>Customer</label><select id="ms-c" onchange="calcM()">${Object.keys(C.RATES).map(c=>`<option>${c}</option>`).join('')}</select></div>
+          </div>
+          <div class="form-row three">
+            <div class="form-group"><label>Morning (L)</label><input type="number" id="ms-m" placeholder="0" oninput="calcM()"></div>
+            <div class="form-group"><label>Evening (L)</label><input type="number" id="ms-e" placeholder="0" oninput="calcM()"></div>
+            <div class="form-group"><label>Value ₹</label><input id="ms-v" readonly></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Received ₹</label><input type="number" id="ms-r" placeholder="0 if unpaid"></div>
+            <div class="form-group"><label>Note</label><input id="ms-n" placeholder="route, tank..."></div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="saveMilk()">💾 Save Entry</button>
+        </div>
+
+        <div class="sec-label">📊 Month Summary</div>
+        <div class="pl-block">
+          <div class="pl-row"><span class="pl-label">Total Litres</span><span class="pl-value">${totL}L</span></div>
+          <div class="pl-row"><span class="pl-label">Total Value</span><span class="pl-value tg">₹${fmt(totV)}</span></div>
+          <div class="pl-row"><span class="pl-label">Received</span><span class="pl-value tg">₹${fmt(totR)}</span></div>
+          <div class="pl-row"><span class="pl-label">Outstanding</span><span class="pl-value tr">₹${fmt(totV-totR)}</span></div>
+        </div>
+      </div>
+    </div>`;
+}
+window.calcM=()=>{const m=parseFloat(document.getElementById('ms-m').value)||0;const e=parseFloat(document.getElementById('ms-e').value)||0;const c=document.getElementById('ms-c').value;document.getElementById('ms-v').value='₹'+fmt((m+e)*(C.RATES[c]||2));};
+window.saveMilk=()=>{
+  const d=document.getElementById('ms-d').value;const c=document.getElementById('ms-c').value;
+  const m=parseFloat(document.getElementById('ms-m').value)||0;const e=parseFloat(document.getElementById('ms-e').value)||0;
+  const litres=m+e;if(!litres){toast('Enter litres','err');return;}
+  const r=parseFloat(document.getElementById('ms-r').value)||0;const n=document.getElementById('ms-n').value.trim();
+  const rate=C.RATES[c]||2;const value=litres*rate;
+  const w=`W${Math.ceil(new Date(d).getDate()/7)}`;
+  DB.milkCust.push({id:uid(),month:curMonth,week:w,date:d,customer:c,morning:m,evening:e,litres,rate,value,received:r,note:n});
+  save();toast('✅ Milk entry saved');['ms-m','ms-e','ms-v','ms-r','ms-n'].forEach(x=>{try{document.getElementById(x).value='';}catch(err){}});
+  renderMilk(document.getElementById('page-milk'));
+};
+window.openMilkModal=id=>{
+  const r=DB.milkCust.find(x=>x.id===id);if(!r)return;
+  openModal(`Milk — ${r.customer}`,`
+    <div class="modal-row"><span class="mr-label">Date</span><span class="mr-value">${fd(r.date)}</span></div>
+    <div class="modal-row"><span class="mr-label">Customer</span><span class="mr-value">${r.customer}</span></div>
+    <div class="modal-row"><span class="mr-label">Morning</span><span class="mr-value">${r.morning}L</span></div>
+    <div class="modal-row"><span class="mr-label">Evening</span><span class="mr-value">${r.evening}L</span></div>
+    <div class="modal-row"><span class="mr-label">Total</span><span class="mr-value fw7">${r.litres}L</span></div>
+    <div class="modal-row"><span class="mr-label">Value</span><span class="mr-value tg">₹${fmt(r.value)}</span></div>
+    <div class="modal-row"><span class="mr-label">Received</span><span class="mr-value">₹${fmt(r.received)}</span></div>
+    <div class="modal-row"><span class="mr-label">Outstanding</span><span class="mr-value ${r.value-r.received>0?'tr':'tg'}">₹${fmt(r.value-r.received)}</span></div>`,
+    `<button style="background:rgba(0,224,122,0.15);color:var(--green)" onclick="markMPaid(${id})">✅ Mark Paid</button>
+     <button style="background:rgba(255,71,87,0.15);color:var(--red)" onclick="delMilk(${id})">🗑 Delete</button>`);
+};
+window.markMPaid=id=>{const r=DB.milkCust.find(x=>x.id===id);if(r){r.received=r.value;save();closeModal();toast('✅ Marked paid');renderMilk(document.getElementById('page-milk'));}};
+window.delMilk=id=>{if(!confirm('Delete?'))return;DB.milkCust=DB.milkCust.filter(x=>x.id!==id);save();closeModal();renderMilk(document.getElementById('page-milk'));};
+
+/* ═══════════════════════════════════════════════════════
+   FEED STOCK
+═══════════════════════════════════════════════════════ */
+function renderStock(el){
+  el.innerHTML=`
+    <div class="content-cols" style="display:flex;gap:20px">
+      <div style="flex:1;min-width:0">
+        <div class="sec-label">📦 Stock Register — ${fd(C.TODAY)}</div>
+        <div class="card">
+          <table class="tbl">
+            <thead><tr><th>Item</th><th>Balance</th><th>Unit</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>${DB.stock.map(s=>`<tr onclick="openStockModal('${s.id}')">
+              <td class="fw7">${s.n}</td>
+              <td class="fw7 mono ${s.b<20?'tr':s.b<50?'ta':'tg'}" style="font-size:18px">${s.b}</td>
+              <td class="tm">${s.u}</td>
+              <td>${s.b<20?'<span class="badge b-red">LOW</span>':s.b<50?'<span class="badge b-amber">OK</span>':'<span class="badge b-green">GOOD</span>'}</td>
+              <td><button class="btn-sm bsm-green" onclick="event.stopPropagation();quickStockUpdate('${s.id}')">✏️</button></td>
+            </tr>`).join('')}</tbody>
+          </table>
+        </div>
+
+        <div class="sec-label">📋 Stock Log (Last 30)</div>
+        <div class="card">
+          ${DB.stockLog.length===0?'<div class="empty"><div class="et">No stock movements recorded yet</div></div>':`
+          <table class="tbl">
+            <thead><tr><th>Date</th><th>Item</th><th>Type</th><th>Qty</th><th>Balance After</th><th>Note</th></tr></thead>
+            <tbody>${DB.stockLog.slice(-30).reverse().map(l=>`<tr>
+              <td class="mono small">${fd(l.d)}</td><td class="fw7">${l.n}</td>
+              <td><span class="badge ${l.t==='IN'?'b-green':'b-red'}">${l.t}</span></td>
+              <td class="mono ${l.t==='IN'?'tg':'tr'}">${l.t==='IN'?'+':'-'}${l.q}</td>
+              <td class="mono">${l.b}</td>
+              <td class="tm small">${l.note||'—'}</td>
+            </tr>`).join('')}</tbody>
+          </table>`}
+        </div>
+      </div>
+
+      <div style="width:300px;flex-shrink:0">
+        <div class="sec-label">📥 Stock In / Out</div>
+        <div class="form-section">
+          <h3>Update Stock</h3>
+          <div class="form-row one"><div class="form-group"><label>Item</label><select id="st-i">${DB.stock.map(s=>`<option value="${s.id}">${s.n}</option>`).join('')}</select></div></div>
+          <div class="form-row">
+            <div class="form-group"><label>Type</label><select id="st-t"><option value="OUT">OUT (Daily Use)</option><option value="IN">IN (Purchase)</option></select></div>
+            <div class="form-group"><label>Quantity</label><input type="number" id="st-q" placeholder="e.g. 10"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Date</label><input type="date" id="st-d" value="${C.TODAY}"></div>
+            <div class="form-group"><label>Note</label><input id="st-n" placeholder="daily use, correction..."></div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="updateStock()">💾 Update</button>
+        </div>
+
+        <div class="sec-label">🆕 Add New Item</div>
+        <div class="form-section">
+          <h3>New Stock Item</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Item Name</label><input id="ni-n" placeholder="Wheat bran"></div>
+            <div class="form-group"><label>Unit</label><input id="ni-u" placeholder="bags/L/kg"></div>
+          </div>
+          <div class="form-row one"><div class="form-group"><label>Opening Balance</label><input type="number" id="ni-b" placeholder="0"></div></div>
+          <button class="btn btn-blue btn-full" onclick="addStockItem()">➕ Add Item</button>
+        </div>
+      </div>
+    </div>`;
+}
+window.openStockModal=id=>{
+  const s=DB.stock.find(x=>x.id===id);if(!s)return;
+  openModal(`Stock: ${s.n}`,`
+    <div class="modal-row"><span class="mr-label">Item</span><span class="mr-value">${s.n}</span></div>
+    <div class="modal-row"><span class="mr-label">Balance</span><span class="mr-value ${s.b<20?'tr':s.b<50?'ta':'tg'} fw7">${s.b} ${s.u}</span></div>
+    <div class="form-group" style="margin-top:14px"><label>Manual Correction — Set balance to</label><input type="number" id="sc-v" value="${s.b}"></div>`,
+    `<button style="background:rgba(0,224,122,0.15);color:var(--green)" onclick="stockCorrect('${id}')">✅ Set Balance</button>
+     <button style="background:rgba(255,71,87,0.15);color:var(--red)" onclick="removeStock('${id}')">🗑 Remove Item</button>`);
+};
+window.stockCorrect=id=>{const s=DB.stock.find(x=>x.id===id);const v=parseInt(document.getElementById('sc-v').value);if(isNaN(v))return;DB.stockLog.push({d:C.TODAY,n:s.n,t:v>s.b?'IN':'OUT',q:Math.abs(v-s.b),b:v,note:'Manual correction'});s.b=v;save();closeModal();toast('✅ Balance corrected');renderStock(document.getElementById('page-stock'));};
+window.removeStock=id=>{if(!confirm('Remove?'))return;DB.stock=DB.stock.filter(x=>x.id!==id);save();closeModal();renderStock(document.getElementById('page-stock'));};
+window.quickStockUpdate=id=>{const s=DB.stock.find(x=>x.id===id);const v=prompt(`${s.n} — Current: ${s.b} ${s.u}\nEnter new balance:`,s.b);if(v!==null){DB.stockLog.push({d:C.TODAY,n:s.n,t:parseInt(v)>s.b?'IN':'OUT',q:Math.abs(parseInt(v)-s.b),b:parseInt(v),note:'Quick update'});s.b=parseInt(v)||0;save();renderStock(document.getElementById('page-stock'));}};
+window.updateStock=()=>{const id=document.getElementById('st-i').value;const t=document.getElementById('st-t').value;const q=parseInt(document.getElementById('st-q').value)||0;const d=document.getElementById('st-d').value;const n=document.getElementById('st-n').value;if(!q){toast('Enter qty','err');return;}const s=DB.stock.find(x=>x.id===id);if(!s)return;s.b=t==='IN'?s.b+q:Math.max(0,s.b-q);DB.stockLog.push({d,n:s.n,t,q,b:s.b,note:n});save();toast(`✅ ${s.n} → ${s.b} ${s.u}`);document.getElementById('st-q').value='';document.getElementById('st-n').value='';renderStock(document.getElementById('page-stock'));};
+window.addStockItem=()=>{const n=document.getElementById('ni-n').value.trim();const u=document.getElementById('ni-u').value.trim()||'units';const b=parseInt(document.getElementById('ni-b').value)||0;if(!n){toast('Enter item name','err');return;}DB.stock.push({id:'s'+uid(),n,u,b});if(b>0)DB.stockLog.push({d:C.TODAY,n,t:'IN',q:b,b,note:'Opening stock'});save();toast('✅ Item added');['ni-n','ni-u','ni-b'].forEach(x=>document.getElementById(x).value='');renderStock(document.getElementById('page-stock'));};
+
+/* ═══════════════════════════════════════════════════════
+   GUJARAT
+═══════════════════════════════════════════════════════ */
+function renderGujarat(el){
+  const tosif=DB.gujBuf.filter(b=>b.care==='Tosif'&&b.status==='active');
+  const noora=DB.gujBuf.filter(b=>b.care==='Noora'&&b.status==='active');
+  const bills=DB.careBills.filter(b=>b.month===curMonth);
+  const trips=DB.transport.filter(t=>t.month===curMonth);
+
+  el.innerHTML=`
+    ${mPills(curMonth,'setGlobalMonth')}
+    <div class="content-cols" style="display:flex;gap:20px">
+      <div style="flex:1;min-width:0">
+        <div class="stat-grid grid-4">
+          <div class="stat-card warn"><div class="sc-num amber">${tosif.length}</div><div class="sc-label">Tosif · Manpura<br>₹3,100/buffalo/mo</div></div>
+          <div class="stat-card warn"><div class="sc-num amber">${noora.length}</div><div class="sc-label">Noora · Gujarat<br>₹3,300/buffalo/mo</div></div>
+          <div class="stat-card"><div class="sc-num red">₹${fmt(C.TR_OUT)}</div><div class="sc-label">Outgoing rate<br>per buffalo</div></div>
+          <div class="stat-card"><div class="sc-num teal">₹${fmt(C.TR_IN)}</div><div class="sc-label">Incoming rate<br>per buffalo</div></div>
+        </div>
+
+        <div class="sec-label">👤 Tosif — ${tosif.length} Buffalo</div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Tosif · Manpura Farm</div><div class="card-meta">${tosif.length} active</div></div>
+          <table class="tbl">
+            <thead><tr><th>Buffalo ID</th><th>Out Date</th><th>Fali Date</th><th>Days Out</th><th>Est. Bill</th><th>Action</th></tr></thead>
+            <tbody>${tosif.map(b=>`<tr>
+              <td class="fw7 ta mono">${b.bufId}</td>
+              <td class="mono small">${fd(b.out)}</td>
+              <td class="mono small">${fd(b.fali)||'—'}</td>
+              <td class="mono">${dAgo(b.out)}d</td>
+              <td class="mono ta">₹${fmt(Math.round(dAgo(b.out)/30*3100))}</td>
+              <td><button class="btn-sm bsm-amber" onclick="returnBuf('${b.id}')">Return</button></td>
+            </tr>`).join('')}</tbody>
+          </table>
+        </div>
+
+        <div class="sec-label">👤 Noora — ${noora.length} Buffalo</div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Noora · Gujarat Farm</div><div class="card-meta">${noora.length} active</div></div>
+          <table class="tbl">
+            <thead><tr><th>Buffalo ID</th><th>Out Date</th><th>Fali Date</th><th>Days Out</th><th>Est. Bill</th><th>Action</th></tr></thead>
+            <tbody>${noora.map(b=>`<tr>
+              <td class="fw7 ta mono">${b.bufId}</td>
+              <td class="mono small">${fd(b.out)}</td>
+              <td class="mono small">${fd(b.fali)||'—'}</td>
+              <td class="mono">${dAgo(b.out)}d</td>
+              <td class="mono ta">₹${fmt(Math.round(dAgo(b.out)/30*3300))}</td>
+              <td><button class="btn-sm bsm-amber" onclick="returnBuf('${b.id}')">Return</button></td>
+            </tr>`).join('')}</tbody>
+          </table>
+        </div>
+
+        <div class="sec-label">📋 Caretaker Bills — ${mll(curMonth)}</div>
+        <div class="card">
+          ${bills.length===0?'<div class="empty"><div class="et">No bills recorded this month</div></div>':`
+          <table class="tbl">
+            <thead><tr><th>Caretaker</th><th>Buffalo</th><th>Days</th><th>Bill</th><th>Paid</th><th>Due</th><th>Status</th></tr></thead>
+            <tbody>${bills.map(b=>`<tr>
+              <td class="fw7">${b.care}</td><td class="mono">${b.count}</td><td class="mono">${b.days}d</td>
+              <td class="mono ta fw7">₹${fmt(b.bill)}</td>
+              <td class="mono tm">₹${fmt(b.paid)}</td>
+              <td class="mono ${b.bill-b.paid>0?'tr':'tg'}">₹${fmt(b.bill-b.paid)}</td>
+              <td>${pBadge(b.paid,b.bill)}</td>
+            </tr>`).join('')}</tbody>
+            <tfoot><tr><td colspan="3">TOTAL</td><td class="mono ta">₹${fmt(bills.reduce((s,b)=>s+b.bill,0))}</td><td></td><td class="mono tr">₹${fmt(bills.reduce((s,b)=>s+b.bill-b.paid,0))} due</td><td></td></tr></tfoot>
+          </table>`}
+        </div>
+
+        <div class="sec-label">🚛 Transport — Irshad · ${mll(curMonth)}</div>
+        <div class="card">
+          ${trips.length===0?'<div class="empty"><div class="et">No transport trips this month</div></div>':`
+          <table class="tbl">
+            <thead><tr><th>Date</th><th>Direction</th><th>Count</th><th>Rate</th><th>Total</th><th>Paid</th><th>Due</th></tr></thead>
+            <tbody>${trips.map(t=>`<tr>
+              <td class="mono small">${fd(t.date)}</td>
+              <td>${t.dir==='out'?'<span class="badge b-amber">→ Gujarat</span>':'<span class="badge b-teal">→ Mumbai</span>'}</td>
+              <td class="mono">${t.count}</td>
+              <td class="mono">₹${fmt(t.rate)}</td>
+              <td class="mono ta fw7">₹${fmt(t.total)}</td>
+              <td class="mono tm">₹${fmt(t.paid)}</td>
+              <td class="mono ${t.total-t.paid>0?'tr':'tg'}">₹${fmt(t.total-t.paid)}</td>
+            </tr>`).join('')}</tbody>
+          </table>`}
+        </div>
+
+        <div class="sec-label">⚰️ Deaths in Gujarat</div>
+        <div class="card">
+          <table class="tbl">
+            <thead><tr><th>Buffalo ID</th><th>Date</th><th>Caretaker</th><th>Loss</th><th>Note</th></tr></thead>
+            <tbody>${DB.deaths.map(d=>`<tr>
+              <td class="fw7 tr mono">${d.bufId}</td>
+              <td class="mono small">${fd(d.date)}</td>
+              <td>${d.care}</td>
+              <td class="mono tr">₹${fmt(d.val)}</td>
+              <td class="tm small">${d.note||'—'}</td>
+            </tr>`).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="width:300px;flex-shrink:0">
+        <div class="sec-label">🧮 Bill Calculator</div>
+        <div class="form-section">
+          <h3>Caretaker Bill</h3>
+          <div class="form-row one"><div class="form-group"><label>Caretaker</label>
+            <select id="cb-c" onchange="calcCare()"><option value="Tosif">Tosif — ₹3,100/mo</option><option value="Noora">Noora — ₹3,300/mo</option></select>
+          </div></div>
+          <div class="form-row one"><div class="form-group"><label>No. of Buffalo</label><input type="number" id="cb-n" oninput="calcCare()" placeholder="17"></div></div>
+          <div class="form-row">
+            <div class="form-group"><label>Date Sent (Out)</label><input type="date" id="cb-o" oninput="calcCare()"></div>
+            <div class="form-group"><label>Date Returned (In)</label><input type="date" id="cb-i" value="${C.TODAY}" oninput="calcCare()"></div>
+          </div>
+          <div id="cb-res" style="display:none;background:rgba(0,0,0,0.3);border-radius:8px;padding:12px;margin:8px 0">
+            <div class="pl-row" style="padding:6px 0"><span class="pl-label">Days</span><span class="pl-value" id="cb-days">—</span></div>
+            <div class="pl-row" style="padding:6px 0"><span class="pl-label">Rate</span><span class="pl-value" id="cb-rate">—</span></div>
+            <div class="pl-row" style="padding:6px 0;background:none"><span class="pl-label fw7 tg">TOTAL BILL</span><span class="pl-value tg" style="font-size:18px" id="cb-total">—</span></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Paid ₹</label><input type="number" id="cb-p" placeholder="0"></div>
+            <div class="form-group"><label>Month</label><select id="cb-m">${C.MONTHS.map(m=>`<option value="${m}" ${m===curMonth?'selected':''}>${ml(m)}</option>`).join('')}</select></div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="saveCareBill()">💾 Save Bill</button>
+        </div>
+
+        <div class="sec-label">🚛 Transport Trip</div>
+        <div class="form-section">
+          <h3>Irshad Transport</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Direction</label><select id="tr-d" onchange="setTrRate()"><option value="out">→ Gujarat ₹1,700</option><option value="in">→ Mumbai ₹3,000</option></select></div>
+            <div class="form-group"><label>Date</label><input type="date" id="tr-dt" value="${C.TODAY}"></div>
+          </div>
+          <div class="form-row three">
+            <div class="form-group"><label>Count</label><input type="number" id="tr-c" oninput="calcTr()"></div>
+            <div class="form-group"><label>Rate</label><input type="number" id="tr-r" value="1700" oninput="calcTr()"></div>
+            <div class="form-group"><label>Total</label><input id="tr-t" readonly></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Paid ₹</label><input type="number" id="tr-p" placeholder="0"></div>
+            <div class="form-group"><label>Month</label><select id="tr-m">${C.MONTHS.map(m=>`<option value="${m}" ${m===curMonth?'selected':''}>${ml(m)}</option>`).join('')}</select></div>
+          </div>
+          <button class="btn btn-amber btn-full" onclick="saveTransport()">💾 Save Transport</button>
+        </div>
+
+        <div class="sec-label">🚛 Send to Gujarat</div>
+        <div class="form-section">
+          <h3>Send Buffalo</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Buffalo ID</label><input id="gs-b" placeholder="e.g. 1609"></div>
+            <div class="form-group"><label>Caretaker</label><select id="gs-c"><option>Tosif</option><option>Noora</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Out Date</label><input type="date" id="gs-o" value="${C.TODAY}"></div>
+            <div class="form-group"><label>Fali Date (send along)</label><input type="date" id="gs-f"></div>
+          </div>
+          <button class="btn btn-amber btn-full" onclick="sendGuj()">🚛 Send to Gujarat</button>
+        </div>
+
+        <div class="sec-label">⚰️ Record Death</div>
+        <div class="form-section">
+          <h3>Death in Gujarat</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Buffalo ID</label><input id="gd-b" placeholder="e.g. 1263"></div>
+            <div class="form-group"><label>Caretaker</label><select id="gd-c"><option>Tosif</option><option>Noora</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Date</label><input type="date" id="gd-d" value="${C.TODAY}"></div>
+            <div class="form-group"><label>Value ₹</label><input type="number" id="gd-v" value="100000"></div>
+          </div>
+          <button class="btn btn-danger btn-full" onclick="recordDeath()">⚰️ Record Death</button>
+        </div>
+      </div>
+    </div>`;
+}
+window.calcCare=()=>{const c=document.getElementById('cb-c').value;const n=parseInt(document.getElementById('cb-n').value)||0;const o=document.getElementById('cb-o').value;const i=document.getElementById('cb-i').value;const res=document.getElementById('cb-res');if(!n||!o||!i){res.style.display='none';return;}const days=Math.round((new Date(i)-new Date(o))/864e5);const rate=C.CARE[c]?.rate||3100;const total=Math.round(days/30*rate*n);document.getElementById('cb-days').textContent=days+'d';document.getElementById('cb-rate').textContent='₹'+fmt(rate)+'/mo';document.getElementById('cb-total').textContent='₹'+fmt(total);res.style.display='';};
+window.saveCareBill=()=>{const c=document.getElementById('cb-c').value;const n=parseInt(document.getElementById('cb-n').value)||0;const o=document.getElementById('cb-o').value;const i=document.getElementById('cb-i').value;const p=parseFloat(document.getElementById('cb-p').value)||0;const m=document.getElementById('cb-m').value;if(!n||!o){toast('Fill all fields','err');return;}const days=i?Math.round((new Date(i)-new Date(o))/864e5):0;const rate=C.CARE[c]?.rate||3100;const bill=Math.round(days/30*rate*n);DB.careBills.push({id:uid(),month:m,care:c,count:n,outDate:o,inDate:i,days,rate,bill,paid:p});save();toast(`✅ ${c} bill ₹${fmt(bill)} saved`);renderGujarat(document.getElementById('page-gujarat'));};
+window.setTrRate=()=>{document.getElementById('tr-r').value=document.getElementById('tr-d').value==='out'?1700:3000;calcTr();};
+window.calcTr=()=>{const c=parseInt(document.getElementById('tr-c').value)||0;const r=parseInt(document.getElementById('tr-r').value)||0;document.getElementById('tr-t').value='₹'+fmt(c*r);};
+window.saveTransport=()=>{const dir=document.getElementById('tr-d').value;const dt=document.getElementById('tr-dt').value;const c=parseInt(document.getElementById('tr-c').value)||0;const r=parseInt(document.getElementById('tr-r').value)||0;const p=parseFloat(document.getElementById('tr-p').value)||0;const m=document.getElementById('tr-m').value;if(!c){toast('Enter count','err');return;}DB.transport.push({id:uid(),month:m,date:dt,dir,count:c,rate:r,total:c*r,paid:p});save();toast('✅ Transport saved');renderGujarat(document.getElementById('page-gujarat'));};
+window.sendGuj=()=>{const b=document.getElementById('gs-b').value.trim();const c=document.getElementById('gs-c').value;const o=document.getElementById('gs-o').value;const f=document.getElementById('gs-f').value;if(!b){toast('Enter buffalo ID','err');return;}DB.gujBuf.push({id:'g'+uid(),care:c,bufId:b,out:o,fali:f,status:'active'});save();toast(`✅ Buffalo ${b} sent to ${c}`);updateSidebarFooter();renderGujarat(document.getElementById('page-gujarat'));};
+window.returnBuf=id=>{const b=DB.gujBuf.find(x=>x.id===id);if(!b)return;b.status='returned';b.returnDate=C.TODAY;save();toast(`✅ Buffalo ${b.bufId} returned`);updateSidebarFooter();renderGujarat(document.getElementById('page-gujarat'));};
+window.recordDeath=()=>{const b=document.getElementById('gd-b').value.trim();const c=document.getElementById('gd-c').value;const d=document.getElementById('gd-d').value;const v=parseFloat(document.getElementById('gd-v').value)||100000;if(!b){toast('Enter buffalo ID','err');return;}DB.deaths.push({id:'d'+uid(),bufId:b,care:c,date:d,val:v,note:''});const gb=DB.gujBuf.find(x=>x.bufId===b&&x.status==='active');if(gb)gb.status='dead';save();toast(`⚰️ Death recorded: #${b}`);renderGujarat(document.getElementById('page-gujarat'));};
+
+/* ═══════════════════════════════════════════════════════
+   LABOUR
+═══════════════════════════════════════════════════════ */
+function renderLabour(el){
+  el.innerHTML=`
+    ${mPills(curMonth,'setGlobalMonth')}
+    <div class="content-cols" style="display:flex;gap:20px">
+      <div style="flex:1;min-width:0">
+        ${['8/1','8/2','both'].map(shed=>`
+        <div class="sec-label">${shed==='both'?'Common Staff':'Shed '+shed}</div>
+        <div class="card">
+          <table class="tbl">
+            <thead><tr><th>Name</th><th>Type</th><th>Salary</th><th>Advance</th><th>Balance</th><th>Due</th><th>Action</th></tr></thead>
+            <tbody>${DB.workers.filter(w=>w.shed===shed).map(w=>{
+              const sr=DB.salaries.find(s=>s.wid===w.id&&s.month===curMonth)||{sal:w.sal,adv:0,bal:0};
+              const due=(sr.sal||w.sal)-(sr.adv||0)-(sr.bal||0);
+              return `<tr onclick="openWorkerModal('${w.id}')">
+                <td class="fw7">${w.name}</td>
+                <td><span class="badge ${w.type==='manager'?'b-blue':w.type==='milking'?'b-green':'b-amber'}">${w.type}</span></td>
+                <td class="mono ta">₹${fmt(sr.sal||w.sal)}</td>
+                <td class="mono tm">₹${fmt(sr.adv||0)}</td>
+                <td class="mono tm">₹${fmt(sr.bal||0)}</td>
+                <td class="mono ${due>0?'tr':'tg'} fw7">₹${fmt(due)}</td>
+                <td><button class="btn-sm bsm-green" onclick="event.stopPropagation();editWorkerSal('${w.id}')">✏️</button></td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>`).join('')}
+      </div>
+      <div style="width:300px;flex-shrink:0">
+        <div class="sec-label">💰 Record Salary</div>
+        <div class="form-section">
+          <h3>Salary Payment</h3>
+          <div class="form-row one"><div class="form-group"><label>Worker</label><select id="sp-w">${DB.workers.map(w=>`<option value="${w.id}">${w.name}</option>`).join('')}</select></div></div>
+          <div class="form-row three">
+            <div class="form-group"><label>Salary ₹</label><input type="number" id="sp-s" placeholder="8000"></div>
+            <div class="form-group"><label>Advance ₹</label><input type="number" id="sp-a" placeholder="0"></div>
+            <div class="form-group"><label>Balance ₹</label><input type="number" id="sp-b" placeholder="0"></div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="saveSalary()">💾 Save</button>
+        </div>
+        <div class="sec-label">➕ Add Worker</div>
+        <div class="form-section">
+          <h3>New Worker</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Name</label><input id="nw-n" placeholder="Worker name"></div>
+            <div class="form-group"><label>Shed</label><select id="nw-s"><option>8/1</option><option>8/2</option><option>both</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Type</label><select id="nw-t"><option>milking</option><option>gobar</option><option>manager</option><option>driver</option><option>cook</option><option>other</option></select></div>
+            <div class="form-group"><label>Salary ₹</label><input type="number" id="nw-sal" placeholder="8000"></div>
+          </div>
+          <button class="btn btn-blue btn-full" onclick="addWorker()">➕ Add Worker</button>
+        </div>
+      </div>
+    </div>`;
+}
+window.openWorkerModal=wid=>{const w=DB.workers.find(x=>x.id===wid);if(!w)return;openModal(`Worker: ${w.name}`,`<div class="modal-row"><span class="mr-label">Name</span><span class="mr-value">${w.name}</span></div><div class="modal-row"><span class="mr-label">Shed</span><span class="mr-value">${w.shed}</span></div><div class="modal-row"><span class="mr-label">Type</span><span class="mr-value">${w.type}</span></div><div class="modal-row"><span class="mr-label">Salary</span><span class="mr-value ta">₹${fmt(w.sal)}</span></div><div class="form-group" style="margin-top:14px"><label>Update Salary ₹</label><input type="number" id="ws-s" value="${w.sal}"></div>`,`<button style="background:rgba(0,224,122,0.15);color:var(--green)" onclick="saveWS('${wid}')">✅ Save</button><button style="background:rgba(255,71,87,0.15);color:var(--red)" onclick="delW('${wid}')">🗑 Remove</button>`);};
+window.saveWS=wid=>{const w=DB.workers.find(x=>x.id===wid);w.sal=parseFloat(document.getElementById('ws-s').value)||0;save();closeModal();toast('✅ Saved');renderLabour(document.getElementById('page-labour'));};
+window.delW=wid=>{if(!confirm('Remove?'))return;DB.workers=DB.workers.filter(x=>x.id!==wid);save();closeModal();renderLabour(document.getElementById('page-labour'));};
+window.editWorkerSal=wid=>{const w=DB.workers.find(x=>x.id===wid);const v=prompt(`Salary for ${w.name}:`,w.sal);if(v!==null){w.sal=parseFloat(v)||0;save();renderLabour(document.getElementById('page-labour'));}};
+window.saveSalary=()=>{const wid=document.getElementById('sp-w').value;const sal=parseFloat(document.getElementById('sp-s').value)||0;const adv=parseFloat(document.getElementById('sp-a').value)||0;const bal=parseFloat(document.getElementById('sp-b').value)||0;const existing=DB.salaries.find(s=>s.wid===wid&&s.month===curMonth);if(existing){existing.sal=sal;existing.adv=adv;existing.bal=bal;}else{DB.salaries.push({id:uid(),wid,month:curMonth,sal,adv,bal});}const w=DB.workers.find(x=>x.id===wid);if(w&&sal)w.sal=sal;save();toast('✅ Salary saved');renderLabour(document.getElementById('page-labour'));};
+window.addWorker=()=>{const n=document.getElementById('nw-n').value.trim();if(!n){toast('Enter name','err');return;}DB.workers.push({id:'w'+uid(),name:n,shed:document.getElementById('nw-s').value,type:document.getElementById('nw-t').value,sal:parseFloat(document.getElementById('nw-sal').value)||0});save();toast('✅ Worker added');renderLabour(document.getElementById('page-labour'));};
+
+/* ═══════════════════════════════════════════════════════
+   ACCOUNTS
+═══════════════════════════════════════════════════════ */
+function renderAccounts(el){
+  el.innerHTML=`
+    ${mPills(curMonth,'setGlobalMonth')}
+    <div class="content-cols" style="display:flex;gap:20px">
+      <div style="flex:1;min-width:0">
+        <div class="sec-label">🛒 Buffalo Purchases — ${mll(curMonth)}</div>
+        <div class="card">
+          ${(DB.purchases||[]).filter(p=>p.month===curMonth).length===0?'<div class="empty"><div class="et">No purchases this month</div></div>':`
+          <table class="tbl">
+            <thead><tr><th>Tag</th><th>Vendor</th><th>State</th><th>Amount</th><th>Paid</th><th>Mode</th><th>Status</th></tr></thead>
+            <tbody>${(DB.purchases||[]).filter(p=>p.month===curMonth).map(p=>`<tr>
+              <td class="fw7 tg mono">${p.tag}</td><td>${p.vendor||'—'}</td><td class="tm">${p.state||'—'}</td>
+              <td class="mono tr fw7">₹${fmt(p.amount)}</td><td class="mono tm">₹${fmt(p.paid)}</td>
+              <td class="small">${p.mode||'Cash'}</td><td>${pBadge(p.paid,p.amount)}</td>
+            </tr>`).join('')}</tbody>
+          </table>`}
+        </div>
+
+        <div class="sec-label">🔪 Slaughter — ${mll(curMonth)}</div>
+        <div class="card">
+          ${(DB.slaughter||[]).filter(s=>s.month===curMonth).length===0?'<div class="empty"><div class="et">No slaughter records</div></div>':`
+          <table class="tbl">
+            <thead><tr><th>Tag</th><th>Buyer</th><th>Amount</th><th>Received</th><th>Status</th></tr></thead>
+            <tbody>${(DB.slaughter||[]).filter(s=>s.month===curMonth).map(s=>`<tr>
+              <td class="fw7 tr mono">${s.tag}</td><td>${s.buyer||'—'}</td>
+              <td class="mono tg fw7">₹${fmt(s.amount)}</td><td class="mono tm">₹${fmt(s.received)}</td>
+              <td>${pBadge(s.received,s.amount)}</td>
+            </tr>`).join('')}</tbody>
+          </table>`}
+        </div>
+
+        <div class="sec-label">💡 Expenses — ${mll(curMonth)}</div>
+        <div class="card">
+          ${(DB.expenses||[]).filter(e=>e.month===curMonth).length===0?'<div class="empty"><div class="et">No expenses recorded</div></div>':`
+          <table class="tbl">
+            <thead><tr><th>Category</th><th>Date</th><th>Amount</th><th>Paid</th><th>Status</th></tr></thead>
+            <tbody>${(DB.expenses||[]).filter(e=>e.month===curMonth).map(e=>`<tr>
+              <td class="fw7">${e.cat}</td><td class="mono small">${fd(e.date)}</td>
+              <td class="mono tr">₹${fmt(e.amount)}</td><td class="mono tm">₹${fmt(e.paid)}</td>
+              <td>${pBadge(e.paid,e.amount)}</td>
+            </tr>`).join('')}</tbody>
+            <tfoot><tr><td colspan="2">TOTAL</td><td class="mono tr">₹${fmt((DB.expenses||[]).filter(e=>e.month===curMonth).reduce((s,e)=>s+e.amount,0))}</td><td class="mono tm">₹${fmt((DB.expenses||[]).filter(e=>e.month===curMonth).reduce((s,e)=>s+e.paid,0))}</td><td></td></tr></tfoot>
+          </table>`}
+        </div>
+
+        <div class="sec-label">🤝 Broker Records</div>
+        <div class="card">
+          ${(DB.brokers||[]).length===0?'<div class="empty"><div class="et">No broker records</div></div>':`
+          <table class="tbl">
+            <thead><tr><th>Broker</th><th>Item/Deal</th><th>Commission</th><th>Paid</th><th>Mode</th><th>Status</th></tr></thead>
+            <tbody>${(DB.brokers||[]).map(b=>`<tr>
+              <td class="fw7">${b.name}</td><td>${b.item}</td>
+              <td class="mono ta">₹${fmt(b.commission)}</td><td class="mono tm">₹${fmt(b.paid)}</td>
+              <td class="small">${b.mode}</td><td>${pBadge(b.paid,b.commission)}</td>
+            </tr>`).join('')}</tbody>
+          </table>`}
+        </div>
+      </div>
+
+      <div style="width:300px;flex-shrink:0">
+        <div class="sec-label">🛒 Add Purchase</div>
+        <div class="form-section">
+          <h3>Buffalo Purchase</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Tag No</label><input id="bp-t" placeholder="e.g. 1900"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="bp-d" value="${C.TODAY}"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Vendor</label><input id="bp-v" placeholder="Vendor name"></div>
+            <div class="form-group"><label>State</label><input id="bp-s" placeholder="Gujarat, UP..."></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Amount ₹</label><input type="number" id="bp-a" placeholder="85000"></div>
+            <div class="form-group"><label>Paid ₹</label><input type="number" id="bp-p" placeholder="0"></div>
+          </div>
+          <div class="form-row one"><div class="form-group"><label>Payment Mode</label><select id="bp-m"><option>Cash</option><option>Cheque</option><option>3rd Party Cheque</option><option>Transfer</option></select></div></div>
+          <button class="btn btn-primary btn-full" onclick="addPurchase()">💾 Save Purchase</button>
+        </div>
+
+        <div class="sec-label">🔪 Add Slaughter</div>
+        <div class="form-section">
+          <h3>Slaughter Record</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Tag No</label><input id="sl-t" placeholder="e.g. 1263"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="sl-d" value="${C.TODAY}"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Sale Amount ₹</label><input type="number" id="sl-a" placeholder="45000"></div>
+            <div class="form-group"><label>Received ₹</label><input type="number" id="sl-r" placeholder="0"></div>
+          </div>
+          <div class="form-row one"><div class="form-group"><label>Buyer Name</label><input id="sl-b" placeholder="Buyer"></div></div>
+          <button class="btn btn-danger btn-full" onclick="addSlaughter()">💾 Save</button>
+        </div>
+
+        <div class="sec-label">💡 Add Expense</div>
+        <div class="form-section">
+          <h3>Light / Water / Rent</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Category</label><select id="ex-c"><option>Light Bill</option><option>Water Bill</option><option>Stable Rent</option><option>Medicine/Vet</option><option>Repair</option><option>Other</option></select></div>
+            <div class="form-group"><label>Date</label><input type="date" id="ex-d" value="${C.TODAY}"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Amount ₹</label><input type="number" id="ex-a" placeholder="5000"></div>
+            <div class="form-group"><label>Paid ₹</label><input type="number" id="ex-p" placeholder="0"></div>
+          </div>
+          <div class="form-row one"><div class="form-group"><label>Note</label><input id="ex-n" placeholder="bill no, reference..."></div></div>
+          <button class="btn btn-primary btn-full" onclick="addExpense()">💾 Save Expense</button>
+        </div>
+
+        <div class="sec-label">🤝 Add Broker</div>
+        <div class="form-section">
+          <h3>Broker Record</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Broker Name</label><input id="br-n" placeholder="Name"></div>
+            <div class="form-group"><label>Item / Deal</label><input id="br-i" placeholder="Buffalo, Feed..."></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Commission ₹</label><input type="number" id="br-c" placeholder="5000"></div>
+            <div class="form-group"><label>Paid ₹</label><input type="number" id="br-p" placeholder="0"></div>
+          </div>
+          <div class="form-row one"><div class="form-group"><label>Mode</label><select id="br-m"><option>Cash</option><option>Cheque</option><option>3rd Party Cheque</option></select></div></div>
+          <button class="btn btn-amber btn-full" onclick="addBroker()">💾 Save Broker</button>
+        </div>
+      </div>
+    </div>`;
+}
+window.addPurchase=()=>{const t=document.getElementById('bp-t').value.trim();if(!t){toast('Enter tag','err');return;}if(!DB.purchases)DB.purchases=[];DB.purchases.push({id:uid(),month:curMonth,date:document.getElementById('bp-d').value,tag:t,vendor:document.getElementById('bp-v').value,state:document.getElementById('bp-s').value,amount:parseFloat(document.getElementById('bp-a').value)||0,paid:parseFloat(document.getElementById('bp-p').value)||0,mode:document.getElementById('bp-m').value});save();toast(`✅ Purchase saved: #${t}`);renderAccounts(document.getElementById('page-accounts'));};
+window.addSlaughter=()=>{const t=document.getElementById('sl-t').value.trim();if(!t){toast('Enter tag','err');return;}if(!DB.slaughter)DB.slaughter=[];DB.slaughter.push({id:uid(),month:curMonth,date:document.getElementById('sl-d').value,tag:t,amount:parseFloat(document.getElementById('sl-a').value)||0,received:parseFloat(document.getElementById('sl-r').value)||0,buyer:document.getElementById('sl-b').value});save();toast(`✅ Slaughter: #${t}`);renderAccounts(document.getElementById('page-accounts'));};
+window.addExpense=()=>{const a=parseFloat(document.getElementById('ex-a').value)||0;if(!a){toast('Enter amount','err');return;}if(!DB.expenses)DB.expenses=[];DB.expenses.push({id:uid(),month:curMonth,date:document.getElementById('ex-d').value,cat:document.getElementById('ex-c').value,amount:a,paid:parseFloat(document.getElementById('ex-p').value)||0,note:document.getElementById('ex-n').value});save();toast('✅ Expense saved');renderAccounts(document.getElementById('page-accounts'));};
+window.addBroker=()=>{const n=document.getElementById('br-n').value.trim();if(!n){toast('Enter broker name','err');return;}if(!DB.brokers)DB.brokers=[];DB.brokers.push({id:uid(),month:curMonth,name:n,item:document.getElementById('br-i').value,commission:parseFloat(document.getElementById('br-c').value)||0,paid:parseFloat(document.getElementById('br-p').value)||0,mode:document.getElementById('br-m').value});save();toast('✅ Broker saved');renderAccounts(document.getElementById('page-accounts'));};
+
+/* ═══════════════════════════════════════════════════════
+   P&L CALCULATOR
+═══════════════════════════════════════════════════════ */
+function calcPL(m){
+  const mk=(DB.milkCust||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.value,0);
+  const sl=(DB.slaughter||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.amount,0);
+  const ex=(DB.expenses||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.amount,0);
+  const cb=(DB.careBills||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.bill,0);
+  const tr=(DB.transport||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.total,0);
+  const lb=(DB.salaries||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.sal,0);
+  const pur=(DB.purchases||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.amount,0);
+  const dl=(DB.deaths||[]).filter(r=>r.date.startsWith(m)).reduce((s,r)=>s+r.val,0);
+  const inc=mk+sl, exp=ex+cb+tr+lb+pur, net=inc-exp-dl;
+  return `<div class="pl-block">
+    <div class="pl-row"><span class="pl-label">🥛 Milk Income</span><span class="pl-value tg">₹${fmt(mk)}</span></div>
+    <div class="pl-row"><span class="pl-label">🔪 Slaughter</span><span class="pl-value tg">₹${fmt(sl)}</span></div>
+    <div class="pl-row"><span class="pl-label">🌾 Feed Stock</span><span class="pl-value tr">₹${fmt(0)}</span></div>
+    <div class="pl-row"><span class="pl-label">👤 Caretakers</span><span class="pl-value tr">₹${fmt(cb)}</span></div>
+    <div class="pl-row"><span class="pl-label">🚛 Transport</span><span class="pl-value tr">₹${fmt(tr)}</span></div>
+    <div class="pl-row"><span class="pl-label">👷 Labour</span><span class="pl-value tr">₹${fmt(lb)}</span></div>
+    <div class="pl-row"><span class="pl-label">💡 Expenses</span><span class="pl-value tr">₹${fmt(ex)}</span></div>
+    <div class="pl-row"><span class="pl-label">🛒 Purchases</span><span class="pl-value tr">₹${fmt(pur)}</span></div>
+    <div class="pl-row"><span class="pl-label">⚰️ Deaths</span><span class="pl-value tr">₹${fmt(dl)}</span></div>
+    <div class="pl-row"><span class="pl-label fw7" style="color:${net>=0?'var(--green)':'var(--red)'}">NET ${net>=0?'PROFIT':'LOSS'}</span><span class="pl-value" style="font-size:20px;color:${net>=0?'var(--green)':'var(--red)'}">₹${fmt(Math.abs(net))}</span></div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MONTHLY REPORT
+═══════════════════════════════════════════════════════ */
+function renderMonthly(el){
+  el.innerHTML=`
+    ${mPills(curMonth,'setGlobalMonth')}
+    <div class="content-cols" style="display:flex;gap:20px">
+      <div style="flex:1;min-width:0">
+        <div class="sec-label">📊 P&L — ${mll(curMonth)}</div>
+        ${calcPL(curMonth)}
+
+        <div class="sec-label">⚠️ Outstanding Summary</div>
+        ${buildOutstanding(curMonth)}
+
+        <div class="sec-label">🥛 Milk Breakdown</div>
+        ${buildMilkBreakdown(curMonth)}
+      </div>
+      <div style="width:300px;flex-shrink:0">
+        <div class="sec-label">👤 Labour Summary</div>
+        ${buildLabourSummary(curMonth)}
+        <div class="sec-label">🚛 Gujarat Summary</div>
+        ${buildGujSummary(curMonth)}
+      </div>
+    </div>`;
+}
+
+function buildOutstanding(m){
+  const mk=(DB.milkCust||[]).filter(r=>r.month===m);
+  const sl=(DB.slaughter||[]).filter(r=>r.month===m);
+  const cb=(DB.careBills||[]).filter(r=>r.month===m);
+  const tr=(DB.transport||[]).filter(r=>r.month===m);
+  const lb=(DB.salaries||[]).filter(r=>r.month===m);
+  const pur=(DB.purchases||[]).filter(r=>r.month===m);
+  const mkDue=mk.reduce((s,r)=>s+r.value-r.received,0);
+  const slDue=sl.reduce((s,r)=>s+r.amount-r.received,0);
+  const cbDue=cb.reduce((s,r)=>s+r.bill-r.paid,0);
+  const trDue=tr.reduce((s,r)=>s+r.total-r.paid,0);
+  const lbDue=lb.reduce((s,r)=>s+r.sal-(r.adv||0)-(r.bal||0),0);
+  const purDue=pur.reduce((s,r)=>s+r.amount-r.paid,0);
+  return `<div class="pl-block">
+    <div class="pl-row"><span class="pl-label">🥛 Milk Receivable</span><span class="pl-value ${mkDue>0?'tr':'tg'}">₹${fmt(mkDue)}</span></div>
+    <div class="pl-row"><span class="pl-label">🔪 Slaughter Receivable</span><span class="pl-value ${slDue>0?'tr':'tg'}">₹${fmt(slDue)}</span></div>
+    <div class="pl-row"><span class="pl-label">👤 Caretaker Due</span><span class="pl-value ${cbDue>0?'tr':'tg'}">₹${fmt(cbDue)}</span></div>
+    <div class="pl-row"><span class="pl-label">🚛 Transport Due</span><span class="pl-value ${trDue>0?'tr':'tg'}">₹${fmt(trDue)}</span></div>
+    <div class="pl-row"><span class="pl-label">👷 Labour Due</span><span class="pl-value ${lbDue>0?'tr':'tg'}">₹${fmt(lbDue)}</span></div>
+    <div class="pl-row"><span class="pl-label">🛒 Purchase Due</span><span class="pl-value ${purDue>0?'tr':'tg'}">₹${fmt(purDue)}</span></div>
+  </div>`;
+}
+
+function buildMilkBreakdown(m){
+  const recs=(DB.milkCust||[]).filter(r=>r.month===m);
+  const byC={};
+  recs.forEach(r=>{ if(!byC[r.customer])byC[r.customer]={l:0,v:0,r:0}; byC[r.customer].l+=r.litres;byC[r.customer].v+=r.value;byC[r.customer].r+=r.received; });
+  if(Object.keys(byC).length===0) return '<div class="card"><div class="empty"><div class="et">No milk records</div></div></div>';
+  return `<div class="card"><table class="tbl">
+    <thead><tr><th>Customer</th><th>Route</th><th>Litres</th><th>Value</th><th>Received</th><th>Due</th></tr></thead>
+    <tbody>${Object.entries(byC).map(([c,v])=>`<tr>
+      <td class="fw7">${c}</td>
+      <td><span class="badge ${C.RATES[c]===2.20?'b-amber':'b-green'}">${C.RATES[c]===2.20?'A':'B'}</span></td>
+      <td class="mono">${v.l}L</td>
+      <td class="mono tg">₹${fmt(v.v)}</td>
+      <td class="mono tm">₹${fmt(v.r)}</td>
+      <td class="mono ${v.v-v.r>0?'tr':'tg'}">₹${fmt(v.v-v.r)}</td>
+    </tr>`).join('')}</tbody>
+    <tfoot><tr><td colspan="2">TOTAL</td><td class="mono">${recs.reduce((s,r)=>s+r.litres,0)}L</td><td class="mono tg">₹${fmt(recs.reduce((s,r)=>s+r.value,0))}</td><td class="mono tm">₹${fmt(recs.reduce((s,r)=>s+r.received,0))}</td><td class="mono tr">₹${fmt(recs.reduce((s,r)=>s+r.value-r.received,0))}</td></tr></tfoot>
+  </table></div>`;
+}
+
+function buildLabourSummary(m){
+  const workers=DB.workers;
+  const total=workers.reduce((s,w)=>{const sr=DB.salaries.find(x=>x.wid===w.id&&x.month===m)||{sal:w.sal,adv:0,bal:0};return s+(sr.sal||w.sal);},0);
+  return `<div class="pl-block">
+    <div class="pl-row"><span class="pl-label">Total Workers</span><span class="pl-value">${workers.length}</span></div>
+    <div class="pl-row"><span class="pl-label">Milkers (8/1+8/2)</span><span class="pl-value">12</span></div>
+    <div class="pl-row"><span class="pl-label">Gobar (8/1+8/2)</span><span class="pl-value">8</span></div>
+    <div class="pl-row"><span class="pl-label">Managers+Common</span><span class="pl-value">4</span></div>
+    <div class="pl-row"><span class="pl-label fw7">Total Salary Bill</span><span class="pl-value ta fw7">₹${fmt(total)}</span></div>
+  </div>`;
+}
+
+function buildGujSummary(m){
+  const t=DB.gujBuf.filter(b=>b.care==='Tosif'&&b.status==='active').length;
+  const n=DB.gujBuf.filter(b=>b.care==='Noora'&&b.status==='active').length;
+  return `<div class="pl-block">
+    <div class="pl-row"><span class="pl-label">Tosif (${t} buffalo)</span><span class="pl-value ta">₹${fmt(t*3100)}</span></div>
+    <div class="pl-row"><span class="pl-label">Noora (${n} buffalo)</span><span class="pl-value ta">₹${fmt(n*3300)}</span></div>
+    <div class="pl-row"><span class="pl-label fw7">Total Est. Bill</span><span class="pl-value ta fw7">₹${fmt(t*3100+n*3300)}</span></div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   YEARLY REPORT
+═══════════════════════════════════════════════════════ */
+function renderYearly(el){
+  let totInc=0,totExp=0,totLoss=0;
+  const rows=C.MONTHS.map(m=>{
+    const mk=(DB.milkCust||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.value,0);
+    const sl=(DB.slaughter||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.amount,0);
+    const ex=(DB.expenses||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.amount,0);
+    const cb=(DB.careBills||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.bill,0);
+    const tr=(DB.transport||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.total,0);
+    const lb=(DB.salaries||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.sal,0);
+    const pur=(DB.purchases||[]).filter(r=>r.month===m).reduce((s,r)=>s+r.amount,0);
+    const dl=(DB.deaths||[]).filter(r=>r.date.startsWith(m)).reduce((s,r)=>s+r.val,0);
+    const inc=mk+sl, exp=ex+cb+tr+lb+pur, net=inc-exp-dl;
+    totInc+=inc; totExp+=exp; totLoss+=dl;
+    return {m,inc,exp,dl,net};
+  });
+  const yearNet=totInc-totExp-totLoss;
+
+  el.innerHTML=`
+    <div class="sec-label">📅 Year 2026 — Annual P&L</div>
+    <div class="pl-block" style="margin-bottom:20px">
+      <div class="pl-row"><span class="pl-label fw7 tg">TOTAL INCOME</span><span class="pl-value tg" style="font-size:18px">₹${fmt(totInc)}</span></div>
+      <div class="pl-row"><span class="pl-label fw7 tr">TOTAL EXPENSE</span><span class="pl-value tr" style="font-size:18px">₹${fmt(totExp)}</span></div>
+      <div class="pl-row"><span class="pl-label fw7 tr">DEATH LOSSES</span><span class="pl-value tr">₹${fmt(totLoss)}</span></div>
+      <div class="pl-row"><span class="pl-label fw7" style="font-size:15px;color:${yearNet>=0?'var(--green)':'var(--red)'}">NET YEAR ${yearNet>=0?'PROFIT':'LOSS'}</span><span class="pl-value" style="font-size:24px;color:${yearNet>=0?'var(--green)':'var(--red)'}">₹${fmt(Math.abs(yearNet))}</span></div>
+    </div>
+
+    <div class="sec-label">Month-by-Month Breakdown</div>
+    <div class="card">
+      <table class="tbl">
+        <thead><tr><th>Month</th><th>Income</th><th>Expense</th><th>Deaths</th><th>Net</th><th>Status</th></tr></thead>
+        <tbody>${rows.map(r=>`<tr class="${r.net<0?'r-alert':'r-ok'}">
+          <td class="fw7">${mll(r.m)}</td>
+          <td class="mono tg">₹${fmt(r.inc)}</td>
+          <td class="mono tr">₹${fmt(r.exp)}</td>
+          <td class="mono tr">₹${fmt(r.dl)}</td>
+          <td class="mono fw7 ${r.net>=0?'tg':'tr'}">₹${fmt(Math.abs(r.net))}</td>
+          <td>${r.net>=0?'<span class="badge b-green">PROFIT</span>':r.inc===0?'<span class="badge b-gray">NO DATA</span>':'<span class="badge b-red">LOSS</span>'}</td>
+        </tr>`).join('')}</tbody>
+        <tfoot><tr><td class="fw7">YEAR TOTAL</td><td class="mono tg">₹${fmt(totInc)}</td><td class="mono tr">₹${fmt(totExp)}</td><td class="mono tr">₹${fmt(totLoss)}</td><td class="mono fw7 ${yearNet>=0?'tg':'tr'}">₹${fmt(Math.abs(yearNet))}</td><td>${yearNet>=0?'<span class="badge b-green">PROFIT</span>':'<span class="badge b-red">LOSS</span>'}</td></tr></tfoot>
+      </table>
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MORE (mobile fallback)
+═══════════════════════════════════════════════════════ */
+function renderMore(el){
+  el.innerHTML=`
+    <div class="sec-label">More Options</div>
+    <div class="stat-grid grid-2">
+      <div class="stat-card" onclick="nav('stock')"><div style="font-size:32px">🌾</div><div class="sc-label" style="margin-top:8px">Feed Stock</div></div>
+      <div class="stat-card" onclick="nav('gujarat')"><div style="font-size:32px">🚛</div><div class="sc-label" style="margin-top:8px">Gujarat / Falat</div></div>
+      <div class="stat-card" onclick="nav('labour')"><div style="font-size:32px">👷</div><div class="sc-label" style="margin-top:8px">Labour</div></div>
+      <div class="stat-card" onclick="nav('accounts')"><div style="font-size:32px">💰</div><div class="sc-label" style="margin-top:8px">Accounts</div></div>
+      <div class="stat-card" onclick="nav('monthly')"><div style="font-size:32px">📆</div><div class="sc-label" style="margin-top:8px">Monthly Report</div></div>
+      <div class="stat-card" onclick="nav('yearly')"><div style="font-size:32px">📅</div><div class="sc-label" style="margin-top:8px">Yearly Report</div></div>
+    </div>
+    <div class="sec-label" style="margin-top:20px">Month</div>
+    ${mPills(curMonth,'setGlobalMonth')}`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════════════════ */
+load();
+updateAlertBadge();
+updateSidebarFooter();
+renderPage('dash');
+</script>
+</body>
+</html>
